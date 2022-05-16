@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="create User table" author="ryazhapov">
+        <createTable tableName="User">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="varchar">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="passwordHash" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="salt" type="bytea">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="varchar" defaultValue="student">
+                <constraints nullable="false"/>
+            </column>
+            <column name="isVerified" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="User" indexName="User_email_idx">
+            <column name="email"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="create Admin table" author="ryazhapov">
+        <createTable tableName="Admin">
+            <column name="userId" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="Admin"
+                                 baseColumnNames="userId"
+                                 constraintName="FK_ADMIN_USER_ID"
+                                 referencedColumnNames="id"
+                                 referencedTableName="User"
+                                 onDelete="CASCADE"
+        />
+    </changeSet>
+
+    <changeSet id="create Student table" author="ryazhapov">
+        <createTable tableName="Student">
+            <column name="userId" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="level" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="balance" type="int" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="Student"
+                                 baseColumnNames="userId"
+                                 constraintName="FK_STUDENT_USER_ID"
+                                 referencedColumnNames="id"
+                                 referencedTableName="User"
+                                 onDelete="CASCADE"
+        />
+    </changeSet>
+
+
+    <changeSet id="create Teacher table" author="ryazhapov">
+        <createTable tableName="Teacher">
+            <column name="userId" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="level" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="isNative" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="balance" type="int" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="Teacher"
+                                 baseColumnNames="userId"
+                                 constraintName="FK_TEACHER_USER_ID"
+                                 referencedColumnNames="id"
+                                 referencedTableName="User"
+                                 onDelete="CASCADE"
+        />
+    </changeSet>
+
+    <changeSet id="create AvailableSlot table" author="ryazhapov">
+        <createTable tableName="AvailableSlot">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="teacherId" type="uuid">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="duration" type="tsrange">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="AvailableSlot"
+                                 baseColumnNames="teacherId"
+                                 constraintName="FK_AVAILABLE_SLOT_TEACHER_ID"
+                                 referencedColumnNames="id"
+                                 referencedTableName="User"
+                                 onDelete="CASCADE"
+        />
+    </changeSet>
+
+    <changeSet id="create BookedSlot table" author="ryazhapov">
+        <createTable tableName="BookedSlot">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="teacherId" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="studentId" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration" type="tsrange">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="BookedSlot"
+                                 baseColumnNames="teacherId"
+                                 constraintName="FK_BOOKED_SLOT_TEACHER_ID"
+                                 referencedColumnNames="id"
+                                 referencedTableName="User"
+                                 onDelete="CASCADE"
+        />
+        <addForeignKeyConstraint baseTableName="BookedSlot"
+                                 baseColumnNames="studentId"
+                                 constraintName="FK_BOOKED_SLOT_STUDENT_ID"
+                                 referencedColumnNames="id"
+                                 referencedTableName="User"
+                                 onDelete="CASCADE"
+        />
+    </changeSet>
+
+    <changeSet id="create Replenishment table" author="ryazhapov">
+        <createTable tableName="Replenishment">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="studentId" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="Replenishment"
+                                 baseColumnNames="studentId"
+                                 constraintName="FK_REPLENISHMENT_STUDENT_ID"
+                                 referencedColumnNames="id"
+                                 referencedTableName="User"
+                                 onDelete="CASCADE"
+        />
+    </changeSet>
+
+    <changeSet id="create Withdrawal table" author="ryazhapov">
+        <createTable tableName="Withdrawal">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="teacherId" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="Withdrawal"
+                                 baseColumnNames="teacherId"
+                                 constraintName="FK_WITHDRAWAL_TEACHER_ID"
+                                 referencedColumnNames="id"
+                                 referencedTableName="User"
+                                 onDelete="CASCADE"
+        />
+    </changeSet>
+
+    <changeSet id="create Transaction table" author="ryazhapov">
+        <createTable tableName="Transaction">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="studentId" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="teacherId" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="Transaction"
+                                 baseColumnNames="studentId"
+                                 constraintName="FK_TRANSACTION_STUDENT_ID"
+                                 referencedColumnNames="id"
+                                 referencedTableName="User"
+                                 onDelete="CASCADE"
+        />
+        <addForeignKeyConstraint baseTableName="Transaction"
+                                 baseColumnNames="teacherId"
+                                 constraintName="FK_TRANSACTION_TEACHER_ID"
+                                 referencedColumnNames="id"
+                                 referencedTableName="User"
+                                 onDelete="CASCADE"
+        />
+    </changeSet>
+
+    <changeSet id="create Session table" author="ryazhapov">
+        <createTable tableName="Session">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="userId" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="Session"
+                                 baseColumnNames="userId"
+                                 constraintName="FK_SESSION_USER_ID"
+                                 referencedColumnNames="id"
+                                 referencedTableName="User"
+                                 onDelete="CASCADE"
+        />
+    </changeSet>
+
+</databaseChangeLog>
