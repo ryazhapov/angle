@@ -37,29 +37,29 @@ object TeacherService {
     override def createTeacher(teacher: Teacher): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor
-        _ <- teacherRepository.create(teacher.toDao).transact(transactor).unit
+        _ <- teacherRepository.create(teacher).transact(transactor).unit
       } yield ()
 
     override def updateTeacher(teacher: Teacher): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor
-        _ <- teacherRepository.update(teacher.toDao).transact(transactor)
+        _ <- teacherRepository.update(teacher).transact(transactor)
       } yield teacher
 
     override def getTeacher(id: UserId): RIO[DBTransactor, Teacher] =
       for {
         transactor <- TransactorService.databaseTransactor
-        teacherDao <- teacherRepository.get(id).transact(transactor)
-        teacher <- ZIO.fromEither(teacherDao.map(_.toTeacher).toRight(TeacherNotFound))
+        teacherOpt <- teacherRepository.get(id).transact(transactor)
+        teacher <- ZIO.fromEither(teacherOpt.toRight(TeacherNotFound))
       } yield teacher
 
     override def getAllTeachers: RIO[DBTransactor, List[Teacher]] =
       for {
         transactor <- TransactorService.databaseTransactor
-        teachersDao <- teacherRepository.getAll.transact(transactor)
-        teachers = teachersDao.map(_.toTeacher)
+        teachers <- teacherRepository.getAll.transact(transactor)
       } yield teachers
 
+    //TODO
     override def deleteTeacher(id: UserId): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor

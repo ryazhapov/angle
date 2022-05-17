@@ -2,6 +2,7 @@ package io.ryazhapov.api.accounts
 
 import io.circe.generic.auto._
 import io.ryazhapov.api.Api
+import io.ryazhapov.domain.accounts.Role.AdminRole
 import io.ryazhapov.domain.accounts.{Admin, Role}
 import io.ryazhapov.domain.auth.UserWithSession
 import io.ryazhapov.services.accounts.AdminService
@@ -21,7 +22,7 @@ class AdminApi[R <: Api.DefaultApiEnv with AdminService with UserService] extend
 
     case authReq @ PUT -> Root / "update" / UUIDVar(id) as UserWithSession(user, session) =>
       user.role match {
-        case Role.AdminRole =>
+        case AdminRole =>
 
           val handleRequest = for {
             _ <- log.info(s"Updating admin $id")
@@ -42,7 +43,7 @@ class AdminApi[R <: Api.DefaultApiEnv with AdminService with UserService] extend
 
     case GET -> Root / UUIDVar(id) as UserWithSession(user, session) =>
       user.role match {
-        case Role.AdminRole =>
+        case AdminRole =>
 
           val handleRequest = for {
             _ <- log.info(s"Getting admin $id")
@@ -58,7 +59,7 @@ class AdminApi[R <: Api.DefaultApiEnv with AdminService with UserService] extend
 
     case GET -> Root as UserWithSession(user, session) =>
       user.role match {
-        case Role.AdminRole =>
+        case AdminRole =>
 
           val handleRequest = for {
             _ <- log.info(s"Getting all admins")
@@ -74,7 +75,7 @@ class AdminApi[R <: Api.DefaultApiEnv with AdminService with UserService] extend
 
     case GET -> Root / "verify" / "show" as UserWithSession(user, session) =>
       user.role match {
-        case Role.AdminRole =>
+        case AdminRole =>
 
           val handleRequest = for {
             _ <- log.info(s"Getting all unverified users")
@@ -88,9 +89,9 @@ class AdminApi[R <: Api.DefaultApiEnv with AdminService with UserService] extend
         case _ => IO(Response(Unauthorized))
       }
 
-    case GET -> Root / "verify" / UUIDVar(id) as UserWithSession(user, session) =>
+    case PUT -> Root / "verify" / UUIDVar(id) as UserWithSession(user, session) =>
       user.role match {
-        case Role.AdminRole =>
+        case AdminRole =>
 
           val handleRequest = for {
             _ <- log.info(s"Verifying user $id")

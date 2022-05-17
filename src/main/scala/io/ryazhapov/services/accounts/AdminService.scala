@@ -11,8 +11,6 @@ import zio.interop.catz._
 import zio.macros.accessible
 import zio.{Has, RIO, ZIO, ZLayer}
 
-import java.util.UUID
-
 @accessible
 object AdminService {
 
@@ -39,29 +37,29 @@ object AdminService {
     override def createAdmin(admin: Admin): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor
-        _ <- adminRepository.create(admin.toDao).transact(transactor).unit
+        _ <- adminRepository.create(admin).transact(transactor).unit
       } yield ()
 
     override def updateAdmin(admin: Admin): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor
-        _ <- adminRepository.update(admin.toDao).transact(transactor)
+        _ <- adminRepository.update(admin).transact(transactor)
       } yield admin
 
     override def getAdmin(id: UserId): RIO[DBTransactor, Admin] =
       for {
         transactor <- TransactorService.databaseTransactor
-        adminDao <- adminRepository.get(id).transact(transactor)
-        admin <- ZIO.fromEither(adminDao.map(_.toAdmin).toRight(AdminNotFound))
+        adminOpt <- adminRepository.get(id).transact(transactor)
+        admin <- ZIO.fromEither(adminOpt.toRight(AdminNotFound))
       } yield admin
 
     override def getAllAdmins: RIO[DBTransactor, List[Admin]] =
       for {
         transactor <- TransactorService.databaseTransactor
-        adminsDao <- adminRepository.getAll.transact(transactor)
-        admins = adminsDao.map(_.toAdmin)
+        admins <- adminRepository.getAll.transact(transactor)
       } yield admins
 
+    //TODO
     override def deleteAdmin(id: UserId): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor

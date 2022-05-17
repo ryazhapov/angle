@@ -10,7 +10,6 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Dependencies.doobie,
     libraryDependencies ++= Dependencies.http4s,
     libraryDependencies ++= Dependencies.circe,
-    //libraryDependencies ++= Dependencies.enumeratum,
     libraryDependencies ++= Dependencies.security,
     libraryDependencies ++= Seq(
       Dependencies.liquibase,

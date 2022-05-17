@@ -8,6 +8,8 @@ import io.ryazhapov.database.repositories.accounts.TeacherRepository.TeacherRepo
 import io.ryazhapov.database.repositories.accounts.{AdminRepository, StudentRepository, TeacherRepository}
 import io.ryazhapov.database.repositories.auth.UserRepository.UserRepository
 import io.ryazhapov.database.repositories.auth.{SessionRepository, UserRepository}
+import io.ryazhapov.database.repositories.lessons.ScheduleRepository
+import io.ryazhapov.database.repositories.lessons.ScheduleRepository.ScheduleRepository
 import io.ryazhapov.database.services.MigrationService.{Liqui, MigrationService}
 import io.ryazhapov.database.services.TransactorService.DBTransactor
 import io.ryazhapov.database.services.{MigrationService, TransactorService}
@@ -19,6 +21,8 @@ import io.ryazhapov.services.accounts.TeacherService.TeacherService
 import io.ryazhapov.services.accounts.{AdminService, StudentService, TeacherService}
 import io.ryazhapov.services.auth.UserService
 import io.ryazhapov.services.auth.UserService.UserService
+import io.ryazhapov.services.lessons.ScheduleService
+import io.ryazhapov.services.lessons.ScheduleService.ScheduleService
 import zio.blocking.Blocking
 import zio.clock.Clock
 import zio.console.Console
@@ -31,6 +35,7 @@ trait Environment {
     UserService with UserRepository with
     TeacherRepository with TeacherService with
     AdminRepository with AdminService with
+    ScheduleRepository with ScheduleService with
     StudentRepository with StudentService
 
 
@@ -42,5 +47,6 @@ trait Environment {
       UserRepository.live >+> UserService.live >+>
       TeacherRepository.live >+> TeacherService.live >+>
       AdminRepository.live >+> AdminService.live >+>
+      ScheduleRepository.live >+> ScheduleService.live >+>
       StudentRepository.live >+> StudentService.live
 }

@@ -1,8 +1,7 @@
 package io.ryazhapov.database.repositories.auth
 
-import io.ryazhapov.database.dao.auth.SessionDao
-import io.ryazhapov.database.repositories.{Repository, auth}
-import io.ryazhapov.domain.{SessionId, UserId}
+import io.ryazhapov.database.repositories.Repository
+import io.ryazhapov.domain.{SessionId, UserId, auth}
 import zio.{Has, ULayer, ZLayer}
 
 object SessionRepository extends Repository {
@@ -12,27 +11,27 @@ object SessionRepository extends Repository {
   type SessionRepository = Has[Service]
 
   trait Service {
-    def insert(session: SessionDao): Result[Unit]
+    def insert(session: auth.Session): Result[Unit]
 
-    def get(id: SessionId): Result[Option[SessionDao]]
+    def get(id: SessionId): Result[Option[auth.Session]]
 
-    def getByUser(userId: UserId): Result[List[SessionDao]]
+    def getByUser(userId: UserId): Result[List[auth.Session]]
 
     def delete(id: SessionId): Result[Unit]
   }
 
   class ServiceImpl() extends Service {
-    lazy val sessionTable: Quoted[EntityQuery[SessionDao]] = quote {
-      querySchema[SessionDao](""""Session"""")
+    lazy val sessionTable: Quoted[EntityQuery[auth.Session]] = quote {
+      querySchema[auth.Session](""""auth.Session"""")
     }
 
-    override def insert(session: SessionDao): Result[Unit] =
+    override def insert(session: auth.Session): Result[Unit] =
       dbContext.run(sessionTable.insert(lift(session))).unit
 
-    override def get(id: SessionId): Result[Option[SessionDao]] =
+    override def get(id: SessionId): Result[Option[auth.Session]] =
       dbContext.run(sessionTable.filter(_.id == lift(id))).map(_.headOption)
 
-    override def getByUser(userId: UserId): Result[List[SessionDao]] =
+    override def getByUser(userId: UserId): Result[List[auth.Session]] =
       dbContext.run(sessionTable.filter(_.userId == lift(userId)))
 
     override def delete(id: SessionId): Result[Unit] =

@@ -6,7 +6,7 @@ import io.ryazhapov.database.services.TransactorService
 import io.ryazhapov.database.services.TransactorService.DBTransactor
 import io.ryazhapov.domain.UserId
 import io.ryazhapov.domain.accounts.Student
-import io.ryazhapov.errors.{StudentNotFound, TeacherNotFound}
+import io.ryazhapov.errors.StudentNotFound
 import zio.interop.catz._
 import zio.macros.accessible
 import zio.{Has, RIO, ZIO, ZLayer}
@@ -37,29 +37,29 @@ object StudentService {
     override def createStudent(student: Student): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor
-        _ <- studentRepository.create(student.toDao).transact(transactor).unit
+        _ <- studentRepository.create(student).transact(transactor).unit
       } yield ()
 
     override def updateStudent(student: Student): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor
-        _ <- studentRepository.update(student.toDao).transact(transactor)
+        _ <- studentRepository.update(student).transact(transactor)
       } yield student
 
     override def getStudent(id: UserId): RIO[DBTransactor, Student] =
       for {
         transactor <- TransactorService.databaseTransactor
-        studentDao <- studentRepository.get(id).transact(transactor)
-        student <- ZIO.fromEither(studentDao.map(_.toStudent).toRight(StudentNotFound))
+        studentOpt <- studentRepository.get(id).transact(transactor)
+        student <- ZIO.fromEither(studentOpt.toRight(StudentNotFound))
       } yield student
 
     override def getAllStudents: RIO[DBTransactor, List[Student]] =
       for {
         transactor <- TransactorService.databaseTransactor
-        studentDao <- studentRepository.getAll.transact(transactor)
-        students = studentDao.map(_.toStudent)
+        students <- studentRepository.getAll.transact(transactor)
       } yield students
 
+    //TODO
     override def deleteStudent(id: UserId): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor

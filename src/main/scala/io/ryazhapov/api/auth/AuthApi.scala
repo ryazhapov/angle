@@ -10,6 +10,7 @@ import io.ryazhapov.domain.auth.{User, UserWithSession}
 import io.ryazhapov.errors.UserAlreadyExists
 import io.ryazhapov.services.accounts.{AdminService, StudentService, TeacherService}
 import io.ryazhapov.services.auth.UserService
+import io.ryazhapov.utils.SecurityUtils
 import org.http4s.{AuthedRoutes, HttpRoutes, Response}
 import zio.interop.catz._
 import zio.logging._
@@ -26,26 +27,30 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
   val standardRoutes: HttpRoutes[ApiTask] = HttpRoutes.of[ApiTask] {
 
     case req @ POST -> Root / "sign_up" =>
+      val salt = SecurityUtils.generateSalt()
       val requestHandler = for {
         _ <- log.info("Sign up attempt")
-        user <- req.as[SignUpUser]
+        apiUser <- req.as[SignUpUser]
         id <- zio.random.nextUUID
-        _ <- UserService.userExists(user.email).flatMap {
+        _ <- UserService.userExists(apiUser.email).flatMap {
           case false => ZIO.succeed(())
           case true  => ZIO.fail(UserAlreadyExists)
         }
-        _ <- UserService.createUser(User(id,
-          user.email,
-          user.role,
-          isVerified = if (user.role == AdminRole) true else false),
-          user.password)
-        _ <- user.role match {
+        _ <- UserService.createUser(User(
+          id,
+          apiUser.email,
+          SecurityUtils.countSecretHash(apiUser.password, salt),
+          salt,
+          apiUser.role,
+          if (apiUser.role == AdminRole) true else false
+        ))
+        _ <- apiUser.role match {
           case AdminRole   => AdminService.createAdmin(Admin(userId = id))
           case TeacherRole => TeacherService.createTeacher(Teacher(userId = id))
           case StudentRole => StudentService.createStudent(Student(userId = id))
         }
         sessionId <- UserService.addSession(id)
-        _ <- log.info(s"User with email=${user.email} signed up successfully")
+        _ <- log.info(s"User with email=${apiUser.email} signed up successfully")
       } yield (id, sessionId)
 
       requestHandler.foldM(
@@ -87,7 +92,8 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
           UserService.getAllUsers.foldM(
             throwableToHttpCode,
             result => okWithCookie(result, session.id))
-        case _         => IO(Response(Unauthorized))
+
+        case _ => IO(Response(Unauthorized))
       }
 
     case GET -> Root / "user" / UUIDVar(id) as UserWithSession(user, session) =>

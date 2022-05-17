@@ -2,7 +2,8 @@ package io.ryazhapov.api.accounts
 
 import io.circe.generic.auto._
 import io.ryazhapov.api.Api
-import io.ryazhapov.domain.accounts.{Role, Teacher}
+import io.ryazhapov.domain.accounts.Role.{AdminRole, TeacherRole}
+import io.ryazhapov.domain.accounts.Teacher
 import io.ryazhapov.domain.auth.UserWithSession
 import io.ryazhapov.services.accounts.TeacherService
 import io.ryazhapov.services.accounts.TeacherService.TeacherService
@@ -19,7 +20,7 @@ class TeacherApi[R <: Api.DefaultApiEnv with TeacherService] extends Api[R] {
 
     case authReq @ PUT -> Root / "update" / UUIDVar(id) as UserWithSession(user, session) =>
       user.role match {
-        case Role.AdminRole | Role.TeacherRole if id == user.id =>
+        case AdminRole | TeacherRole if id == user.id =>
           val handleRequest = for {
             _ <- log.info(s"Updating teacher $id")
             request <- authReq.req.as[Teacher]

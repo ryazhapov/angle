@@ -67,7 +67,6 @@
         />
     </changeSet>
 
-
     <changeSet id="create Teacher table" author="ryazhapov">
         <createTable tableName="Teacher">
             <column name="userId" type="uuid">
@@ -92,29 +91,32 @@
         />
     </changeSet>
 
-    <changeSet id="create AvailableSlot table" author="ryazhapov">
-        <createTable tableName="AvailableSlot">
+    <changeSet id="create Schedule table" author="ryazhapov">
+        <createTable tableName="Schedule">
             <column name="id" type="uuid">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="teacherId" type="uuid">
-                <constraints nullable="false" unique="true"/>
+                <constraints nullable="false"/>
             </column>
-            <column name="duration" type="tsrange">
+            <column name="startsAt" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="endsAt" type="timestamp with time zone">
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint baseTableName="AvailableSlot"
+        <addForeignKeyConstraint baseTableName="Schedule"
                                  baseColumnNames="teacherId"
-                                 constraintName="FK_AVAILABLE_SLOT_TEACHER_ID"
+                                 constraintName="FK_SCHEDULE_TEACHER_ID"
                                  referencedColumnNames="id"
                                  referencedTableName="User"
                                  onDelete="CASCADE"
         />
     </changeSet>
 
-    <changeSet id="create BookedSlot table" author="ryazhapov">
-        <createTable tableName="BookedSlot">
+    <changeSet id="create Lesson table" author="ryazhapov">
+        <createTable tableName="Lesson">
             <column name="id" type="uuid">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -124,23 +126,39 @@
             <column name="studentId" type="uuid">
                 <constraints nullable="false"/>
             </column>
-            <column name="duration" type="tsrange">
+            <column name="startsAt" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="endsAt" type="timestamp with time zone">
+                <constraints nullable="false"/>
+            </column>
+            <column name="isCompleted" type="boolean">
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint baseTableName="BookedSlot"
+        <addForeignKeyConstraint baseTableName="Lesson"
                                  baseColumnNames="teacherId"
-                                 constraintName="FK_BOOKED_SLOT_TEACHER_ID"
+                                 constraintName="FK_LESSON_TEACHER_ID"
                                  referencedColumnNames="id"
                                  referencedTableName="User"
                                  onDelete="CASCADE"
         />
-        <addForeignKeyConstraint baseTableName="BookedSlot"
+        <addForeignKeyConstraint baseTableName="Lesson"
                                  baseColumnNames="studentId"
-                                 constraintName="FK_BOOKED_SLOT_STUDENT_ID"
+                                 constraintName="FK_LESSON_STUDENT_ID"
                                  referencedColumnNames="id"
                                  referencedTableName="User"
                                  onDelete="CASCADE"
+        />
+        <addUniqueConstraint
+                columnNames="teacherId, startsAt"
+                constraintName="UK_TEACHER_LESSON"
+                tableName="Lesson"
+        />
+        <addUniqueConstraint
+                columnNames="studentId, startsAt"
+                constraintName="UK_STUDENT_LESSON"
+                tableName="Lesson"
         />
     </changeSet>
 

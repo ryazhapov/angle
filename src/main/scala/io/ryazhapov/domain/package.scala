@@ -7,10 +7,10 @@ package object domain {
   type SessionId = UUID
   type Password = String
 
-  type AvailableSlotId = UUID
-  type BookedSlotId = UUID
+  type ScheduleId = UUID
+  type LessonId = UUID
 
-  type TransactionId = UUID
   type ReplenishmentId = UUID
+  type TransactionId = UUID
   type WithdrawalId = UUID
 }

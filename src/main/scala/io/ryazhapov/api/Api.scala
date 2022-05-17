@@ -5,10 +5,9 @@ import io.circe.{Decoder, Encoder}
 import io.ryazhapov.config.Config
 import io.ryazhapov.config.ConfigService.Configuration
 import io.ryazhapov.database.services.TransactorService.DBTransactor
+import io.ryazhapov.domain.SessionId
 import io.ryazhapov.domain.auth.UserWithSession
-import io.ryazhapov.domain.{SessionId, auth}
-import io.ryazhapov.errors
-import io.ryazhapov.errors.SessionCookieIsAbsent
+import io.ryazhapov.errors.{AppError, SessionCookieIsAbsent}
 import io.ryazhapov.logging.LoggerService.LoggerService
 import io.ryazhapov.services.accounts.AdminService.AdminService
 import io.ryazhapov.services.accounts.StudentService.StudentService
@@ -57,7 +56,7 @@ trait Api[R <: DefaultApiEnv] extends ErrorMapping[R] {
       )))
     } yield result
 
-  def extractCookie(request: Request[ApiTask]): IO[errors.Error, String] =
+  def extractCookie(request: Request[ApiTask]): IO[AppError, String] =
     ZIO.fromEither(
       request.headers.get(Cookie)
         .flatMap(_.values.toList.find(_.name == "ssid"))
@@ -71,7 +70,7 @@ trait Api[R <: DefaultApiEnv] extends ErrorMapping[R] {
       session <- UserService.getSession(sessionId)
       userId = session.userId
       user <- UserService.getUser(userId)
-    } yield auth.UserWithSession(user, session)
+    } yield UserWithSession(user, session)
   }
 
   private val authUser: Kleisli[ApiTask, Request[ApiTask], Either[String, UserWithSession]] = Kleisli { request =>

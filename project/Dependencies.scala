@@ -1,7 +1,5 @@
-import Dependencies.versions.ZioVersion
-import sbt.ModuleID
-import sbt._
 import Dependencies.versions._
+import sbt.{ModuleID, _}
 
 object Dependencies {
 
@@ -42,7 +40,7 @@ object Dependencies {
 
   lazy val postgres = "org.postgresql" % "postgresql" % PostgresVersion
 
-  lazy val logback = "ch.qos.logback"  %  "logback-classic" % LogbackVersion
+  lazy val logback = "ch.qos.logback" % "logback-classic" % LogbackVersion
 
   lazy val circe: Seq[ModuleID] = Seq(
     "io.circe" %% "circe-generic" % CirceVersion,
@@ -57,13 +55,7 @@ object Dependencies {
     "org.http4s" %% "http4s-blaze-client" % Http4sVersion
   )
 
-//  lazy val enumeratum: Seq[ModuleID] = Seq(
-//    "com.beachape" %% "enumeratum-circe" % "1.6.0",
-//    "com.beachape" %% "enumeratum" % "1.6.0"
-//  )
-
   lazy val security: Seq[ModuleID] = Seq(
     "commons-codec" % "commons-codec" % CommonsCodecVersion
   )
-
 }

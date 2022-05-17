@@ -1,9 +1,8 @@
 package io.ryazhapov.database.repositories.accounts
 
-import io.ryazhapov.database.dao.accounts.StudentDao
-import io.ryazhapov.database.repositories.{Repository, accounts}
+import io.ryazhapov.database.repositories.Repository
 import io.ryazhapov.domain.UserId
-import io.ryazhapov.domain.accounts.Level
+import io.ryazhapov.domain.accounts.{Level, Student}
 import zio.{Has, ULayer, ZLayer}
 
 object StudentRepository extends Repository {
@@ -16,32 +15,32 @@ object StudentRepository extends Repository {
   private implicit val decodeLevel: MappedEncoding[String, Level] = MappedEncoding[String, Level](Level.fromString)
 
   trait Service {
-    def create(student: StudentDao): Result[Unit]
+    def create(student: Student): Result[Unit]
 
-    def update(student: StudentDao): Result[Unit]
+    def update(student: Student): Result[Unit]
 
-    def get(id: UserId): Result[Option[StudentDao]]
+    def get(id: UserId): Result[Option[Student]]
 
-    def getAll: Result[List[StudentDao]]
+    def getAll: Result[List[Student]]
 
     def delete(id: UserId): Result[Unit]
   }
 
   class ServiceImpl() extends Service {
-    lazy val StudentTable: Quoted[EntityQuery[StudentDao]] = quote {
-      querySchema[StudentDao](""""Student"""")
+    lazy val StudentTable: Quoted[EntityQuery[Student]] = quote {
+      querySchema[Student](""""Student"""")
     }
 
-    override def create(student: StudentDao): Result[Unit] =
+    override def create(student: Student): Result[Unit] =
       dbContext.run(StudentTable.insert(lift(student))).unit
 
-    override def update(student: StudentDao): Result[Unit] =
+    override def update(student: Student): Result[Unit] =
       dbContext.run(StudentTable.update(lift(student))).unit
 
-    override def get(id: UserId): Result[Option[StudentDao]] =
+    override def get(id: UserId): Result[Option[Student]] =
       dbContext.run(StudentTable.filter(_.userId == lift(id))).map(_.headOption)
 
-    override def getAll: Result[List[StudentDao]] =
+    override def getAll: Result[List[Student]] =
       dbContext.run(StudentTable)
 
     override def delete(id: UserId): Result[Unit] =
