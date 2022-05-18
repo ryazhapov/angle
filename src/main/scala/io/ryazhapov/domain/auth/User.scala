@@ -9,5 +9,5 @@ case class User(
   passwordHash: String,
   salt: Array[Byte],
   role: Role,
-  isVerified: Boolean
+  verified: Boolean
 )

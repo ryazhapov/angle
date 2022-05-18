@@ -32,19 +32,29 @@ object AdminRepository extends Repository {
     }
 
     override def create(admin: Admin): Result[Unit] =
-      dbContext.run(adminTable.insert(lift(admin))).unit
+      dbContext.run(adminTable
+        .insert(lift(admin))
+      ).unit
 
     override def update(admin: Admin): Result[Unit] =
-      dbContext.run(adminTable.filter(_.userId == lift(admin.userId)).update(lift(admin))).unit
+      dbContext.run(adminTable
+        .filter(_.userId == lift(admin.userId))
+        .update(lift(admin))
+      ).unit
 
     override def get(id: UserId): Result[Option[Admin]] =
-      dbContext.run(adminTable.filter(_.userId == lift(id))).map(_.headOption)
+      dbContext.run(adminTable
+        .filter(_.userId == lift(id))
+      ).map(_.headOption)
 
     override def getAll: Result[List[Admin]] =
       dbContext.run(adminTable)
 
     override def delete(id: UserId): Result[Unit] =
-      dbContext.run(adminTable.filter(_.userId == lift(id)).delete).unit
+      dbContext.run(adminTable
+        .filter(_.userId == lift(id))
+        .delete
+      ).unit
   }
 
   lazy val live: ULayer[AdminRepository] =

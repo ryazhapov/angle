@@ -1,4 +1,4 @@
-package io.ryazhapov.domain.lessions
+package io.ryazhapov.domain.lessons
 
 import io.ryazhapov.domain.{ScheduleId, UserId}
 

@@ -43,8 +43,8 @@ object TeacherService {
     override def updateTeacher(teacher: Teacher): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor
-        _ <- teacherRepository.update(teacher).transact(transactor)
-      } yield teacher
+        _ <- teacherRepository.update(teacher).transact(transactor).unit
+      } yield ()
 
     override def getTeacher(id: UserId): RIO[DBTransactor, Teacher] =
       for {

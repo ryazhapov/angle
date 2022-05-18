@@ -15,12 +15,17 @@ package object errors {
   case object TeacherNotFound extends AppError("Teacher not found")
   case object StudentNotFound extends AppError("Student not found")
   case object ScheduleNotFound extends AppError("Schedule not found")
+  case object LessonNotFound extends AppError("Lesson not found")
 
   case object UserAlreadyExists extends AppError("User already exists")
   case object TeacherAlreadyExists extends AppError("Teacher already exists")
   case object StudentAlreadyExists extends AppError("Student already exists")
 
+  case object LessonOverlapping extends AppError("Lesson is overlapping another lesson")
   case object ScheduleOverlapping extends AppError("Schedule is overlapping another schedule")
   case object ScheduleAlreadyExists extends AppError("Schedule already exists")
   case object InvalidScheduleTime extends AppError("Invalid schedule time: Duration is zero or negative")
+  case object InvalidLessonTime extends AppError("Invalid lesson time: Duration is zero or negative")
+
+  case object UnauthorizedActionWithLesson extends AppError("Performing action with lesson for another student or teacher")
 }

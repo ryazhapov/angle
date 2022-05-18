@@ -4,7 +4,7 @@ import cats.data.Kleisli
 import cats.effect.{ExitCode => CatsExitCode}
 import io.ryazhapov.api.accounts.{AdminApi, TeacherApi}
 import io.ryazhapov.api.auth.AuthApi
-import io.ryazhapov.api.lessons.ScheduleApi
+import io.ryazhapov.api.lessons.{LessonApi, ScheduleApi}
 import io.ryazhapov.config.Config
 import io.ryazhapov.database.services.MigrationService.performMigration
 import org.http4s.implicits._
@@ -23,7 +23,8 @@ object Server extends Environment {
     "/api/auth" -> new AuthApi().routes,
     "/api/teacher" -> new TeacherApi().routes,
     "/api/admin" -> new AdminApi().routes,
-    "/api/schedule" -> new ScheduleApi().routes
+    "/api/schedule" -> new ScheduleApi().routes,
+    "/api/lesson" -> new LessonApi().routes
   ).orNotFound
 
   val server: ZIO[AppEnvironment, Throwable, Unit] = for {

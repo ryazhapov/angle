@@ -29,8 +29,8 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
     case req @ POST -> Root / "sign_up" =>
       val salt = SecurityUtils.generateSalt()
       val requestHandler = for {
-        _ <- log.info("Sign up attempt")
         apiUser <- req.as[SignUpUser]
+        _ <- log.info(s"Sign up attempt email = ${apiUser.email}")
         id <- zio.random.nextUUID
         _ <- UserService.userExists(apiUser.email).flatMap {
           case false => ZIO.succeed(())
@@ -50,7 +50,7 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
           case StudentRole => StudentService.createStudent(Student(userId = id))
         }
         sessionId <- UserService.addSession(id)
-        _ <- log.info(s"User with email=${apiUser.email} signed up successfully")
+        _ <- log.info(s"User with email = ${apiUser.email} signed up successfully")
       } yield (id, sessionId)
 
       requestHandler.foldM(

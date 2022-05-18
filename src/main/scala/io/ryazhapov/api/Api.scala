@@ -45,7 +45,8 @@ trait Api[R <: DefaultApiEnv] extends ErrorMapping[R] {
 
   object UserIdParamMatcher extends QueryParamDecoderMatcher[String]("userId")
 
-  def okWithCookie[A](result: A, sessionId: SessionId)(implicit encoder: EntityEncoder[ApiTask, A]): ZIO[R, Throwable, Response[Api.this.ApiTask]#Self] =
+  def okWithCookie[A](result: A, sessionId: SessionId)
+    (implicit encoder: EntityEncoder[ApiTask, A]): ZIO[R, Throwable, Response[Api.this.ApiTask]#Self] =
     for {
       config <- zio.config.getConfig[Config]
       result <- Ok(result).map(_.addCookie(ResponseCookie(

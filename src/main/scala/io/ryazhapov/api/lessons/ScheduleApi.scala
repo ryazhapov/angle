@@ -5,8 +5,10 @@ import io.ryazhapov.api.Api
 import io.ryazhapov.domain.UserId
 import io.ryazhapov.domain.accounts.Role.StudentRole
 import io.ryazhapov.domain.auth.UserWithSession
-import io.ryazhapov.domain.lessions.Schedule
+import io.ryazhapov.domain.lessons.Schedule
 import io.ryazhapov.errors.ScheduleOverlapping
+import io.ryazhapov.services.accounts.TeacherService
+import io.ryazhapov.services.accounts.TeacherService.TeacherService
 import io.ryazhapov.services.lessons.ScheduleService
 import io.ryazhapov.services.lessons.ScheduleService.ScheduleService
 import org.http4s.{AuthedRoutes, HttpRoutes, QueryParamDecoder, Response}
@@ -17,7 +19,7 @@ import zio.{IO, ZIO}
 import java.time.ZonedDateTime
 import java.util.UUID
 
-class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
+class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService with TeacherService] extends Api[R] {
 
   import dsl._
 
@@ -41,6 +43,7 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
         case _ =>
           val handleRequest = for {
             scheduleReq <- authReq.req.as[ScheduleRequest]
+            _ <- TeacherService.getTeacher(scheduleReq.teacherId)
             _ <- log.info(s"Creating schedule for ${scheduleReq.teacherId}")
             id <- zio.random.nextUUID
             schedule = Schedule(

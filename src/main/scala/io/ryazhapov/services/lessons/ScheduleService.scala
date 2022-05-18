@@ -4,7 +4,7 @@ import io.ryazhapov.database.repositories.lessons.ScheduleRepository
 import io.ryazhapov.database.repositories.lessons.ScheduleRepository.ScheduleRepository
 import io.ryazhapov.database.services.TransactorService
 import io.ryazhapov.database.services.TransactorService.DBTransactor
-import io.ryazhapov.domain.lessions.Schedule
+import io.ryazhapov.domain.lessons.Schedule
 import io.ryazhapov.domain.{ScheduleId, UserId}
 import io.ryazhapov.errors.{InvalidScheduleTime, ScheduleNotFound}
 import zio.interop.catz._
@@ -28,7 +28,7 @@ object ScheduleService {
 
     def getScheduleByTeacherId(teacherId: UserId): RIO[DBTransactor, List[Schedule]]
 
-    def getScheduleByTime(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): RIO[DBTransactor, List[Schedule]]
+    def findScheduleForLesson(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): RIO[DBTransactor, List[Schedule]]
 
     def isOverlapping(schedule: Schedule): RIO[DBTransactor, Boolean]
 
@@ -55,8 +55,8 @@ object ScheduleService {
       for {
         transactor <- TransactorService.databaseTransactor
         updateSchedule = scheduleRepository.update(schedule).transact(transactor)
-        _ <- ZIO.cond(isValidSchedule(schedule), updateSchedule, InvalidScheduleTime)
-      } yield schedule
+        _ <- ZIO.cond(isValidSchedule(schedule), updateSchedule, InvalidScheduleTime).unit
+      } yield ()
 
     override def getSchedule(id: ScheduleId): RIO[DBTransactor, Schedule] =
       for {
@@ -74,21 +74,21 @@ object ScheduleService {
     override def getScheduleByTeacherId(teacherId: UserId): RIO[DBTransactor, List[Schedule]] =
       for {
         transactor <- TransactorService.databaseTransactor
-        schedules <- scheduleRepository.getByTeacherId(teacherId).transact(transactor)
+        schedules <- scheduleRepository.getByTeacher(teacherId).transact(transactor)
       } yield schedules
 
     //TODO
-    override def getScheduleByTime(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): RIO[DBTransactor, List[Schedule]] =
+    override def findScheduleForLesson(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): RIO[DBTransactor, List[Schedule]] =
       for {
         transactor <- TransactorService.databaseTransactor
-        schedules <- scheduleRepository.getByTime(lessonStart, lessonEnd).transact(transactor)
+        schedules <- scheduleRepository.findIntersection(lessonStart, lessonEnd).transact(transactor)
       } yield schedules
 
     override def isOverlapping(schedule: Schedule): RIO[DBTransactor, Boolean] =
       for {
         _ <- ZIO.cond(isValidSchedule(schedule), (), InvalidScheduleTime)
         transactor <- TransactorService.databaseTransactor
-        schedules <- scheduleRepository.findIntersections(schedule).transact(transactor)
+        schedules <- scheduleRepository.findUnion(schedule).transact(transactor)
         result = schedules match {
           case ::(_, _) => true
           case Nil      => false

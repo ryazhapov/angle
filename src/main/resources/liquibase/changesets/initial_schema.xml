@@ -22,7 +22,7 @@
             <column name="role" type="varchar" defaultValue="student">
                 <constraints nullable="false"/>
             </column>
-            <column name="isVerified" type="boolean" defaultValue="false">
+            <column name="verified" type="boolean" defaultValue="false">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -75,7 +75,7 @@
             <column name="level" type="varchar">
                 <constraints nullable="false"/>
             </column>
-            <column name="isNative" type="boolean" defaultValueBoolean="false">
+            <column name="native" type="boolean" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
             <column name="balance" type="int" defaultValue="0">
@@ -132,7 +132,7 @@
             <column name="endsAt" type="timestamp with time zone">
                 <constraints nullable="false"/>
             </column>
-            <column name="isCompleted" type="boolean">
+            <column name="completed" type="boolean">
                 <constraints nullable="false"/>
             </column>
         </createTable>

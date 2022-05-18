@@ -32,19 +32,29 @@ object TeacherRepository extends Repository {
     }
 
     override def create(teacher: Teacher): Result[Unit] =
-      dbContext.run(teacherTable.insert(lift(teacher))).unit
+      dbContext.run(teacherTable
+        .insert(lift(teacher))
+      ).unit
 
     override def update(teacher: Teacher): Result[Unit] =
-      dbContext.run(teacherTable.filter(_.userId == lift(teacher.userId)).update(lift(teacher))).unit
+      dbContext.run(teacherTable
+        .filter(_.userId == lift(teacher.userId))
+        .update(lift(teacher))
+      ).unit
 
     override def get(id: UserId): Result[Option[Teacher]] =
-      dbContext.run(teacherTable.filter(_.userId == lift(id))).map(_.headOption)
+      dbContext.run(teacherTable
+        .filter(_.userId == lift(id))
+      ).map(_.headOption)
 
     override def getAll: Result[List[Teacher]] =
       dbContext.run(teacherTable)
 
     override def delete(id: UserId): Result[Unit] =
-      dbContext.run(teacherTable.filter(_.userId == lift(id)).delete).unit
+      dbContext.run(teacherTable
+        .filter(_.userId == lift(id))
+        .delete
+      ).unit
   }
 
   lazy val live: ULayer[TeacherRepository] =

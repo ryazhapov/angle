@@ -43,8 +43,8 @@ object StudentService {
     override def updateStudent(student: Student): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor
-        _ <- studentRepository.update(student).transact(transactor)
-      } yield student
+        _ <- studentRepository.update(student).transact(transactor).unit
+      } yield ()
 
     override def getStudent(id: UserId): RIO[DBTransactor, Student] =
       for {
@@ -63,7 +63,7 @@ object StudentService {
     override def deleteStudent(id: UserId): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor
-        _ <- studentRepository.delete(id).transact(transactor)
+        _ <- studentRepository.delete(id).transact(transactor).unit
       } yield ()
   }
 

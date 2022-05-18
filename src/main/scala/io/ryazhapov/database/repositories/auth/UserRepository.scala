@@ -1,6 +1,6 @@
 package io.ryazhapov.database.repositories.auth
 
-import io.ryazhapov.database.repositories.{Repository, auth}
+import io.ryazhapov.database.repositories.Repository
 import io.ryazhapov.domain.UserId
 import io.ryazhapov.domain.accounts.Role
 import io.ryazhapov.domain.auth.User
@@ -41,31 +41,50 @@ object UserRepository extends Repository {
     }
 
     override def create(user: User): Result[Unit] =
-      dbContext.run(userTable.insert(lift(user))).unit
+      dbContext.run(userTable
+        .insert(lift(user))
+      ).unit
 
     override def update(user: User): Result[Unit] =
-      dbContext.run(userTable.update(lift(user))).unit
+      dbContext.run(userTable
+        .update(lift(user))
+      ).unit
 
     override def verify(id: UserId): Result[Unit] =
-      dbContext.run(userTable.filter(_.id == lift(id)).update(_.isVerified -> lift(true))).unit
+      dbContext.run(userTable
+        .filter(_.id == lift(id))
+        .update(_.verified -> lift(true))
+      ).unit
 
     override def get(id: UserId): Result[Option[User]] =
-      dbContext.run(userTable.filter(_.id == lift(id))).map(_.headOption)
+      dbContext.run(userTable
+        .filter(_.id == lift(id))
+      ).map(_.headOption)
 
     override def getAll: Result[List[User]] =
       dbContext.run(userTable)
 
     override def getUnverified: Result[List[User]] =
-      dbContext.run(userTable.filter(_.isVerified == lift(false)))
+      dbContext.run(userTable
+        .filter(_.verified == lift(false))
+      )
 
     override def getByEmail(email: String): Result[Option[User]] =
-      dbContext.run(userTable.filter(_.email == lift(email))).map(_.headOption)
+      dbContext.run(userTable
+        .filter(_.email == lift(email))
+      ).map(_.headOption)
 
     override def delete(id: UserId): Result[Unit] =
-      dbContext.run(userTable.filter(_.id == lift(id)).delete).unit
+      dbContext.run(userTable
+        .filter(_.id == lift(id))
+        .delete
+      ).unit
 
     override def deleteByEmail(email: String): Result[Unit] =
-      dbContext.run(userTable.filter(_.email == lift(email)).delete).unit
+      dbContext.run(userTable
+        .filter(_.email == lift(email))
+        .delete
+      ).unit
   }
 
   lazy val live: ULayer[UserRepository.UserRepository] =

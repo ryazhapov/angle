@@ -6,6 +6,6 @@ import io.ryazhapov.domain.accounts.Level.UpperIntermediate
 case class Teacher(
   userId: UserId,
   level: Level = UpperIntermediate,
-  isNative: Boolean = false,
+  native: Boolean = false,
   balance: Int = 0
 )

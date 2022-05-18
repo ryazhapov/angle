@@ -43,8 +43,8 @@ object AdminService {
     override def updateAdmin(admin: Admin): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor
-        _ <- adminRepository.update(admin).transact(transactor)
-      } yield admin
+        _ <- adminRepository.update(admin).transact(transactor).unit
+      } yield ()
 
     override def getAdmin(id: UserId): RIO[DBTransactor, Admin] =
       for {

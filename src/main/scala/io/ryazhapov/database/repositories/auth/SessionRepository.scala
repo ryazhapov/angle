@@ -22,20 +22,29 @@ object SessionRepository extends Repository {
 
   class ServiceImpl() extends Service {
     lazy val sessionTable: Quoted[EntityQuery[auth.Session]] = quote {
-      querySchema[auth.Session](""""auth.Session"""")
+      querySchema[auth.Session](""""Session"""")
     }
 
     override def insert(session: auth.Session): Result[Unit] =
-      dbContext.run(sessionTable.insert(lift(session))).unit
+      dbContext.run(sessionTable
+        .insert(lift(session))
+      ).unit
 
     override def get(id: SessionId): Result[Option[auth.Session]] =
-      dbContext.run(sessionTable.filter(_.id == lift(id))).map(_.headOption)
+      dbContext.run(sessionTable
+        .filter(_.id == lift(id))
+      ).map(_.headOption)
 
     override def getByUser(userId: UserId): Result[List[auth.Session]] =
-      dbContext.run(sessionTable.filter(_.userId == lift(userId)))
+      dbContext.run(sessionTable
+        .filter(_.userId == lift(userId))
+      )
 
     override def delete(id: SessionId): Result[Unit] =
-      dbContext.run(sessionTable.filter(_.id == lift(id)).delete).unit
+      dbContext.run(sessionTable
+        .filter(_.id == lift(id))
+        .delete
+      ).unit
   }
 
   lazy val live: ULayer[SessionRepository.SessionRepository] =
