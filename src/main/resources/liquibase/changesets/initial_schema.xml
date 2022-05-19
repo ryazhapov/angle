@@ -78,6 +78,9 @@
             <column name="native" type="boolean" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
+            <column name="rate" type="int" defaultValue="500">
+                <constraints nullable="false"/>
+            </column>
             <column name="balance" type="int" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
@@ -204,8 +207,8 @@
         />
     </changeSet>
 
-    <changeSet id="create Transaction table" author="ryazhapov">
-        <createTable tableName="Transaction">
+    <changeSet id="create Payment table" author="ryazhapov">
+        <createTable tableName="Payment">
             <column name="id" type="uuid">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -219,16 +222,16 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint baseTableName="Transaction"
+        <addForeignKeyConstraint baseTableName="Payment"
                                  baseColumnNames="studentId"
-                                 constraintName="FK_TRANSACTION_STUDENT_ID"
+                                 constraintName="FK_PAYMENT_STUDENT_ID"
                                  referencedColumnNames="id"
                                  referencedTableName="User"
                                  onDelete="CASCADE"
         />
-        <addForeignKeyConstraint baseTableName="Transaction"
+        <addForeignKeyConstraint baseTableName="Payment"
                                  baseColumnNames="teacherId"
-                                 constraintName="FK_TRANSACTION_TEACHER_ID"
+                                 constraintName="FK_PAYMENT_TEACHER_ID"
                                  referencedColumnNames="id"
                                  referencedTableName="User"
                                  onDelete="CASCADE"

@@ -47,8 +47,8 @@ object ScheduleService {
     override def createSchedule(schedule: Schedule): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor
-        _ <- ZIO.cond(isValidSchedule(schedule), (), InvalidScheduleTime)
-        _ <- scheduleRepository.create(schedule).transact(transactor).unit
+        createSchedule = scheduleRepository.create(schedule).transact(transactor).unit
+        _ <- ZIO.cond(isValidSchedule(schedule), createSchedule, InvalidScheduleTime)
       } yield ()
 
     override def updateSchedule(schedule: Schedule): RIO[DBTransactor, Unit] =
@@ -77,7 +77,6 @@ object ScheduleService {
         schedules <- scheduleRepository.getByTeacher(teacherId).transact(transactor)
       } yield schedules
 
-    //TODO
     override def findScheduleForLesson(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): RIO[DBTransactor, List[Schedule]] =
       for {
         transactor <- TransactorService.databaseTransactor

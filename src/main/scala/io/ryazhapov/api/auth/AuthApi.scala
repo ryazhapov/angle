@@ -33,8 +33,8 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
         _ <- log.info(s"Sign up attempt email = ${apiUser.email}")
         id <- zio.random.nextUUID
         _ <- UserService.userExists(apiUser.email).flatMap {
-          case false => ZIO.succeed(())
           case true  => ZIO.fail(UserAlreadyExists)
+          case false => ZIO.succeed(())
         }
         _ <- UserService.createUser(User(
           id,

@@ -14,12 +14,13 @@ import zio.{Has, RIO, ZIO, ZLayer}
 
 @accessible
 object LessonService {
+
   type LessonService = Has[Service]
 
   trait Service {
     def createLesson(lesson: Lesson): RIO[DBTransactor, Unit]
 
-    def updateLesson(lesson: Lesson): RIO[DBTransactor, Unit]
+    def completeLesson(id: LessonId): RIO[DBTransactor, Unit]
 
     def getLesson(id: LessonId): RIO[DBTransactor, Lesson]
 
@@ -52,11 +53,13 @@ object LessonService {
         _ <- lessonRepository.create(lesson).transact(transactor).unit
       } yield ()
 
-    override def updateLesson(lesson: Lesson): RIO[DBTransactor, Unit] =
+    override def completeLesson(id: LessonId): RIO[DBTransactor, Unit] =
       for {
         transactor <- TransactorService.databaseTransactor
-        updateLesson = lessonRepository.update(lesson).transact(transactor)
-        _ <- ZIO.cond(isValidLesson(lesson), updateLesson, InvalidLessonTime).unit
+        lessonOpt <- lessonRepository.get(id).transact(transactor)
+        lesson <- ZIO.fromEither(lessonOpt.toRight(LessonNotFound))
+        completed = lesson.copy(completed = true)
+        _ <- lessonRepository.update(completed).transact(transactor).unit
       } yield ()
 
     override def getLesson(id: LessonId): RIO[DBTransactor, Lesson] =

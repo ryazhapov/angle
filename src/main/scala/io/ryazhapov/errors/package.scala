@@ -17,6 +17,10 @@ package object errors {
   case object ScheduleNotFound extends AppError("Schedule not found")
   case object LessonNotFound extends AppError("Lesson not found")
 
+  case object ReplenishmentNotFound extends AppError("Replenishment not found")
+  case object PaymentNotFound extends AppError("Payment not found")
+  case object WithdrawalNotFound extends AppError("Withdrawal not found")
+
   case object UserAlreadyExists extends AppError("User already exists")
   case object TeacherAlreadyExists extends AppError("Teacher already exists")
   case object StudentAlreadyExists extends AppError("Student already exists")
@@ -27,5 +31,5 @@ package object errors {
   case object InvalidScheduleTime extends AppError("Invalid schedule time: Duration is zero or negative")
   case object InvalidLessonTime extends AppError("Invalid lesson time: Duration is zero or negative")
 
-  case object UnauthorizedActionWithLesson extends AppError("Performing action with lesson for another student or teacher")
+  case object UnauthorizedAction extends AppError("Performing unauthorized actions")
 }

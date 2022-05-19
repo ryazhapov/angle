@@ -27,6 +27,7 @@ trait Repository {
     ZonedDateTime.ofInstant(row.getTimestamp(index).toInstant, ZoneId.of("UTC"))
   })
 
+  // don't add type annotations, app won't compile, reason: https://github.com/zio/zio-quill/issues/1406
   implicit class ZonedDateTimeQuotes(left: ZonedDateTime) {
     def >(right: ZonedDateTime) = quote(infix"$left > $right".as[Boolean])
 

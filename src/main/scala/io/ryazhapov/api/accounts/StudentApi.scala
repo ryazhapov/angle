@@ -12,7 +12,6 @@ import zio.IO
 import zio.interop.catz._
 import zio.logging._
 
-
 class StudentApi[R <: Api.DefaultApiEnv with StudentService] extends Api[R] {
 
   import dsl._

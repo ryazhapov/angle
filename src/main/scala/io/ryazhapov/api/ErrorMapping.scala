@@ -33,7 +33,11 @@ trait ErrorMapping[R <: Api.DefaultApiEnv] {
       case LessonNotFound   => NotFound(e.getMessage)
       case SessionNotFound  => NotFound(e.getMessage)
 
-      case UnauthorizedActionWithLesson => BadRequest(e.getMessage)
+      case ReplenishmentNotFound => NotFound(e.getMessage)
+      case PaymentNotFound       => NotFound(e.getMessage)
+      case WithdrawalNotFound    => NotFound(e.getMessage)
+
+      case UnauthorizedAction => BadRequest(e.getMessage)
 
       case _ => InternalServerError(e.getMessage)
     }

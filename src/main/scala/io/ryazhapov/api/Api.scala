@@ -24,6 +24,8 @@ import zio.interop.catz._
 import zio.random.Random
 import zio.{IO, RIO, ZIO}
 
+import java.util.UUID
+
 object Api {
   type DefaultApiEnv = AdminService with StudentService with TeacherService with UserService
     with DBTransactor with Random with Console with Configuration with LoggerService
@@ -39,11 +41,20 @@ trait Api[R <: DefaultApiEnv] extends ErrorMapping[R] {
 
   import dsl._
 
+  object TeacherIdParamMatcher extends QueryParamDecoderMatcher[UUID]("teacher")
+
+  object LessonIdParamMatcher extends QueryParamDecoderMatcher[UUID]("lesson")
+
+  object ScheduleIdParamMatcher extends QueryParamDecoderMatcher[UUID]("schedule")
+
+  object CompletedParamMatcher extends QueryParamDecoderMatcher[Boolean]("completed")
+
+  implicit val uuidQueryParamDecoder: QueryParamDecoder[UUID] =
+    QueryParamDecoder[String].map(UUID.fromString)
+
   implicit def jsonDecoder[A](implicit decoder: Decoder[A]): EntityDecoder[ApiTask, A] = jsonOf[ApiTask, A]
 
   implicit def jsonEncoder[A](implicit decoder: Encoder[A]): EntityEncoder[ApiTask, A] = jsonEncoderOf[ApiTask, A]
-
-  object UserIdParamMatcher extends QueryParamDecoderMatcher[String]("userId")
 
   def okWithCookie[A](result: A, sessionId: SessionId)
     (implicit encoder: EntityEncoder[ApiTask, A]): ZIO[R, Throwable, Response[Api.this.ApiTask]#Self] =

@@ -11,6 +11,6 @@ package object domain {
   type LessonId = UUID
 
   type ReplenishmentId = UUID
-  type TransactionId = UUID
+  type PaymentId = UUID
   type WithdrawalId = UUID
 }
