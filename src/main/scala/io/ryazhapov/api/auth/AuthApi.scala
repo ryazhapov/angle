@@ -20,10 +20,6 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
 
   import dsl._
 
-  case class SignInUser(email: String, password: Password)
-
-  case class SignUpUser(email: String, password: Password, role: Role)
-
   val standardRoutes: HttpRoutes[ApiTask] = HttpRoutes.of[ApiTask] {
 
     case req @ POST -> Root / "sign_up" =>
@@ -84,7 +80,6 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
         session => okWithCookie(session.userId, session.id)
       )
   }
-
   val authedRoutes: AuthedRoutes[UserWithSession, ApiTask] = AuthedRoutes.of[UserWithSession, ApiTask] {
     case GET -> Root / "users" as UserWithSession(user, session) =>
       user.role match {
@@ -116,4 +111,8 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
 
   override def routes: HttpRoutes[ApiTask] =
     standardRoutes <+> authMiddleware(authedRoutes)
+
+  case class SignInUser(email: String, password: Password)
+
+  case class SignUpUser(email: String, password: Password, role: Role)
 }

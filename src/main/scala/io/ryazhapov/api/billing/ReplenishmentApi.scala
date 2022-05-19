@@ -5,6 +5,7 @@ import io.ryazhapov.api.Api
 import io.ryazhapov.domain.accounts.Role.{AdminRole, StudentRole}
 import io.ryazhapov.domain.auth.UserWithSession
 import io.ryazhapov.domain.billing.Replenishment
+import io.ryazhapov.services.accounts.StudentService
 import io.ryazhapov.services.accounts.StudentService.StudentService
 import io.ryazhapov.services.billing.ReplenishmentService
 import io.ryazhapov.services.billing.ReplenishmentService.ReplenishmentService
@@ -17,10 +18,6 @@ class ReplenishmentApi[R <: Api.DefaultApiEnv with ReplenishmentService with Stu
 
   import dsl._
 
-  case class ReplenishmentRequest(
-    amount: Int
-  )
-
   val replenishmentRoutes: AuthedRoutes[UserWithSession, ApiTask] = AuthedRoutes.of[UserWithSession, ApiTask] {
 
     case authReq @ PUT -> Root / "create" as UserWithSession(user, session) =>
@@ -28,6 +25,7 @@ class ReplenishmentApi[R <: Api.DefaultApiEnv with ReplenishmentService with Stu
         case StudentRole =>
           val handleRequest = for {
             _ <- log.info(s"Creating replenishment for ${user.id}")
+            foundStudent <- StudentService.getStudent(user.id)
             request <- authReq.req.as[ReplenishmentRequest]
             id <- zio.random.nextUUID
             replenishment = Replenishment(
@@ -35,7 +33,9 @@ class ReplenishmentApi[R <: Api.DefaultApiEnv with ReplenishmentService with Stu
               user.id,
               request.amount
             )
-            result <- ReplenishmentService.createReplenishment(replenishment)
+            updatedStudent = foundStudent.copy(balance = foundStudent.balance + request.amount)
+            result <- StudentService.updateStudent(updatedStudent) *>
+              ReplenishmentService.createReplenishment(replenishment)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,
@@ -72,4 +72,8 @@ class ReplenishmentApi[R <: Api.DefaultApiEnv with ReplenishmentService with Stu
 
   override def routes: HttpRoutes[ApiTask] =
     authMiddleware(replenishmentRoutes)
+
+  case class ReplenishmentRequest(
+    amount: Int
+  )
 }

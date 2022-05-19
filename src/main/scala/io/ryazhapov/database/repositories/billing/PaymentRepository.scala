@@ -10,6 +10,8 @@ object PaymentRepository extends Repository {
   import dbContext._
 
   type PaymentRepository = Has[Service]
+  lazy val live: ULayer[PaymentRepository] =
+    ZLayer.succeed(new ServiceImpl())
 
   trait Service {
     def create(payment: Payment): Result[Unit]
@@ -58,7 +60,4 @@ object PaymentRepository extends Repository {
         .filter(_.lessonId == lift(lessonId))
       ).map(_.headOption)
   }
-
-  lazy val live: ULayer[PaymentRepository] =
-    ZLayer.succeed(new ServiceImpl())
 }

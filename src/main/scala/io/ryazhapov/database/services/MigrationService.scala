@@ -16,15 +16,17 @@ object MigrationService {
 
   type Liqui = Has[Liquibase]
   type MigrationService = Has[MigrationService.Service]
+  lazy val live: ULayer[MigrationService] =
+    ZLayer.succeed(new MigrationServiceImpl())
+  val liquibaseLayer: ZLayer[DBTransactor with Configuration, Throwable, Liqui] = ZLayer.fromManaged(
+    for {
+      config <- zio.config.getConfig[Config].toManaged_
+      transactor <- TransactorService.databaseTransactor.toManaged_
+      liquibase <- createLiquibase(config, transactor)
+    } yield liquibase
+  )
 
-  trait Service {
-    def performMigration: RIO[Liqui, Unit]
-  }
-
-  class MigrationServiceImpl extends Service {
-    override def performMigration: ZIO[Liqui, Nothing, Unit] =
-      liquibase.map(_.update("dev"))
-  }
+  def liquibase: URIO[Liqui, Liquibase] = ZIO.service[Liquibase]
 
   private def createLiquibase(
     config: Config,
@@ -40,16 +42,12 @@ object MigrationService {
       liqui <- ZIO.effect(new Liquibase(config.liquibase.changeLog, fileOpener, jdbcConnection)).toManaged_
     } yield liqui
 
-  val liquibaseLayer: ZLayer[DBTransactor with Configuration, Throwable, Liqui] = ZLayer.fromManaged(
-    for {
-      config <- zio.config.getConfig[Config].toManaged_
-      transactor <- TransactorService.databaseTransactor.toManaged_
-      liquibase <- createLiquibase(config, transactor)
-    } yield liquibase
-  )
+  trait Service {
+    def performMigration: RIO[Liqui, Unit]
+  }
 
-  def liquibase: URIO[Liqui, Liquibase] = ZIO.service[Liquibase]
-
-  lazy val live: ULayer[MigrationService] =
-    ZLayer.succeed(new MigrationServiceImpl())
+  class MigrationServiceImpl extends Service {
+    override def performMigration: ZIO[Liqui, Nothing, Unit] =
+      liquibase.map(_.update("dev"))
+  }
 }

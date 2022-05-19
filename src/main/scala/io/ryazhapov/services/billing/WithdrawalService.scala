@@ -14,6 +14,8 @@ import zio.{Has, RIO, ZLayer}
 object WithdrawalService {
 
   type WithdrawalService = Has[Service]
+  lazy val live: ZLayer[WithdrawalRepository, Nothing, WithdrawalService] =
+    ZLayer.fromService[WithdrawalRepository.Service, WithdrawalService.Service](repo => new ServiceImpl(repo))
 
   trait Service {
     def createWithdrawal(withdrawal: Withdrawal): RIO[DBTransactor, Unit]
@@ -47,7 +49,4 @@ object WithdrawalService {
         withdrawal <- withdrawalRepository.getByTeacher(teacherId).transact(transactor)
       } yield withdrawal
   }
-
-  lazy val live: ZLayer[WithdrawalRepository, Nothing, WithdrawalService] =
-    ZLayer.fromService[WithdrawalRepository.Service, WithdrawalService.Service](repo => new ServiceImpl(repo))
 }

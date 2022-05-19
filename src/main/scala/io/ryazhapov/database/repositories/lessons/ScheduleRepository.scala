@@ -12,6 +12,8 @@ object ScheduleRepository extends Repository {
   import dbContext._
 
   type ScheduleRepository = Has[Service]
+  lazy val live: ULayer[ScheduleRepository] =
+    ZLayer.succeed(new ServiceImpl())
 
   trait Service {
     def create(schedule: Schedule): Result[Unit]
@@ -80,7 +82,4 @@ object ScheduleRepository extends Repository {
         .delete
       ).unit
   }
-
-  lazy val live: ULayer[ScheduleRepository] =
-    ZLayer.succeed(new ServiceImpl())
 }

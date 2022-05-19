@@ -9,6 +9,8 @@ object SessionRepository extends Repository {
   import dbContext._
 
   type SessionRepository = Has[Service]
+  lazy val live: ULayer[SessionRepository.SessionRepository] =
+    ZLayer.succeed(new ServiceImpl())
 
   trait Service {
     def insert(session: auth.Session): Result[Unit]
@@ -46,7 +48,4 @@ object SessionRepository extends Repository {
         .delete
       ).unit
   }
-
-  lazy val live: ULayer[SessionRepository.SessionRepository] =
-    ZLayer.succeed(new ServiceImpl())
 }

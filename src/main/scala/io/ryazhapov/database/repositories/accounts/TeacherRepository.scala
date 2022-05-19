@@ -13,6 +13,8 @@ object TeacherRepository extends Repository {
 
   private implicit val encodeLevel: MappedEncoding[Level, String] = MappedEncoding[Level, String](_.toString)
   private implicit val decodeLevel: MappedEncoding[String, Level] = MappedEncoding[String, Level](Level.fromString)
+  lazy val live: ULayer[TeacherRepository] =
+    ZLayer.succeed(new ServiceImpl())
 
   trait Service {
     def create(teacher: Teacher): Result[Unit]
@@ -56,7 +58,4 @@ object TeacherRepository extends Repository {
         .delete
       ).unit
   }
-
-  lazy val live: ULayer[TeacherRepository] =
-    ZLayer.succeed(new ServiceImpl())
 }

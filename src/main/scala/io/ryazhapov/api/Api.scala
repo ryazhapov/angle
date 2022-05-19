@@ -40,21 +40,14 @@ trait Api[R <: DefaultApiEnv] extends ErrorMapping[R] {
   val dsl: Http4sDsl[ApiTask] = Http4sDsl[ApiTask]
 
   import dsl._
-
-  object TeacherIdParamMatcher extends QueryParamDecoderMatcher[UUID]("teacher")
-
-  object LessonIdParamMatcher extends QueryParamDecoderMatcher[UUID]("lesson")
-
-  object ScheduleIdParamMatcher extends QueryParamDecoderMatcher[UUID]("schedule")
-
-  object CompletedParamMatcher extends QueryParamDecoderMatcher[Boolean]("completed")
-
-  implicit val uuidQueryParamDecoder: QueryParamDecoder[UUID] =
-    QueryParamDecoder[String].map(UUID.fromString)
-
-  implicit def jsonDecoder[A](implicit decoder: Decoder[A]): EntityDecoder[ApiTask, A] = jsonOf[ApiTask, A]
-
-  implicit def jsonEncoder[A](implicit decoder: Encoder[A]): EntityEncoder[ApiTask, A] = jsonEncoderOf[ApiTask, A]
+  private val authUser: Kleisli[ApiTask, Request[ApiTask], Either[String, UserWithSession]] = Kleisli { request =>
+    getUser(request).foldM(
+      error => ZIO.left(error.getMessage),
+      result => ZIO.right(result)
+    )
+  }
+  private val onFailure: AuthedRoutes[String, ApiTask] = Kleisli(req => OptionT.liftF(Forbidden(req.context)))
+  val authMiddleware: AuthMiddleware[ApiTask, UserWithSession] = AuthMiddleware(authUser, onFailure)
 
   def okWithCookie[A](result: A, sessionId: SessionId)
     (implicit encoder: EntityEncoder[ApiTask, A]): ZIO[R, Throwable, Response[Api.this.ApiTask]#Self] =
@@ -68,13 +61,14 @@ trait Api[R <: DefaultApiEnv] extends ErrorMapping[R] {
       )))
     } yield result
 
-  def extractCookie(request: Request[ApiTask]): IO[AppError, String] =
-    ZIO.fromEither(
-      request.headers.get(Cookie)
-        .flatMap(_.values.toList.find(_.name == "ssid"))
-        .map(_.content)
-        .toRight(SessionCookieIsAbsent)
-    )
+  implicit val uuidQueryParamDecoder: QueryParamDecoder[UUID] =
+    QueryParamDecoder[String].map(UUID.fromString)
+
+  implicit def jsonDecoder[A](implicit decoder: Decoder[A]): EntityDecoder[ApiTask, A] = jsonOf[ApiTask, A]
+
+  implicit def jsonEncoder[A](implicit decoder: Encoder[A]): EntityEncoder[ApiTask, A] = jsonEncoderOf[ApiTask, A]
+
+  def routes: HttpRoutes[ApiTask]
 
   private def getUser(request: Request[ApiTask]): ApiTask[UserWithSession] = {
     for {
@@ -85,15 +79,19 @@ trait Api[R <: DefaultApiEnv] extends ErrorMapping[R] {
     } yield UserWithSession(user, session)
   }
 
-  private val authUser: Kleisli[ApiTask, Request[ApiTask], Either[String, UserWithSession]] = Kleisli { request =>
-    getUser(request).foldM(
-      error => ZIO.left(error.getMessage),
-      result => ZIO.right(result)
+  def extractCookie(request: Request[ApiTask]): IO[AppError, String] =
+    ZIO.fromEither(
+      request.headers.get(Cookie)
+        .flatMap(_.values.toList.find(_.name == "ssid"))
+        .map(_.content)
+        .toRight(SessionCookieIsAbsent)
     )
-  }
 
-  private val onFailure: AuthedRoutes[String, ApiTask] = Kleisli(req => OptionT.liftF(Forbidden(req.context)))
-  val authMiddleware: AuthMiddleware[ApiTask, UserWithSession] = AuthMiddleware(authUser, onFailure)
+  object TeacherIdParamMatcher extends QueryParamDecoderMatcher[UUID]("teacher")
 
-  def routes: HttpRoutes[ApiTask]
+  object LessonIdParamMatcher extends QueryParamDecoderMatcher[UUID]("lesson")
+
+  object ScheduleIdParamMatcher extends QueryParamDecoderMatcher[UUID]("schedule")
+
+  object CompletedParamMatcher extends QueryParamDecoderMatcher[Boolean]("completed")
 }

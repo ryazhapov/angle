@@ -16,6 +16,11 @@ import java.time.ZonedDateTime
 @accessible
 object ScheduleService {
   type ScheduleService = Has[Service]
+  lazy val live: ZLayer[ScheduleRepository, Nothing, ScheduleService] =
+    ZLayer.fromService[ScheduleRepository.Service, ScheduleService.Service](repo => new ServiceImpl(repo))
+
+  def isValidSchedule(schedule: Schedule): Boolean =
+    schedule.startsAt.isBefore(schedule.endsAt) && !schedule.startsAt.isEqual(schedule.endsAt)
 
   trait Service {
     def createSchedule(schedule: Schedule): RIO[DBTransactor, Unit]
@@ -34,9 +39,6 @@ object ScheduleService {
 
     def deleteSchedule(id: ScheduleId): RIO[DBTransactor, Unit]
   }
-
-  def isValidSchedule(schedule: Schedule): Boolean =
-    schedule.startsAt.isBefore(schedule.endsAt) && !schedule.startsAt.isEqual(schedule.endsAt)
 
   class ServiceImpl(
     scheduleRepository: ScheduleRepository.Service
@@ -100,7 +102,4 @@ object ScheduleService {
         _ <- scheduleRepository.delete(id).transact(transactor)
       } yield ()
   }
-
-  lazy val live: ZLayer[ScheduleRepository, Nothing, ScheduleService] =
-    ZLayer.fromService[ScheduleRepository.Service, ScheduleService.Service](repo => new ServiceImpl(repo))
 }

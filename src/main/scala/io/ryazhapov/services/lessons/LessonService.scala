@@ -16,6 +16,11 @@ import zio.{Has, RIO, ZIO, ZLayer}
 object LessonService {
 
   type LessonService = Has[Service]
+  lazy val live: ZLayer[LessonRepository, Nothing, LessonService] =
+    ZLayer.fromService[LessonRepository.Service, LessonService.Service](repo => new ServiceImpl(repo))
+
+  def isValidLesson(lesson: Lesson): Boolean =
+    lesson.startsAt.isBefore(lesson.endsAt) && !lesson.startsAt.isEqual(lesson.endsAt)
 
   trait Service {
     def createLesson(lesson: Lesson): RIO[DBTransactor, Unit]
@@ -36,9 +41,6 @@ object LessonService {
 
     def deleteLesson(id: LessonId): RIO[DBTransactor, Unit]
   }
-
-  def isValidLesson(lesson: Lesson): Boolean =
-    lesson.startsAt.isBefore(lesson.endsAt) && !lesson.startsAt.isEqual(lesson.endsAt)
 
   class ServiceImpl(
     lessonRepository: LessonRepository.Service
@@ -110,7 +112,4 @@ object LessonService {
         _ <- lessonRepository.delete(id).transact(transactor)
       } yield ()
   }
-
-  lazy val live: ZLayer[LessonRepository, Nothing, LessonService] =
-    ZLayer.fromService[LessonRepository.Service, LessonService.Service](repo => new ServiceImpl(repo))
 }

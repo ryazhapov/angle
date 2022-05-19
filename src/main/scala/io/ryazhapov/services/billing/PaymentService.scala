@@ -15,6 +15,8 @@ import zio.{Has, RIO, ZIO, ZLayer}
 object PaymentService {
 
   type PaymentService = Has[Service]
+  lazy val live: ZLayer[PaymentRepository, Nothing, PaymentService] =
+    ZLayer.fromService[PaymentRepository.Service, PaymentService.Service](repo => new ServiceImpl(repo))
 
   trait Service {
     def createPayment(payment: Payment): RIO[DBTransactor, Unit]
@@ -74,7 +76,4 @@ object PaymentService {
         payment <- ZIO.fromEither(paymentOpt.toRight(PaymentNotFound))
       } yield payment
   }
-
-  lazy val live: ZLayer[PaymentRepository, Nothing, PaymentService] =
-    ZLayer.fromService[PaymentRepository.Service, PaymentService.Service](repo => new ServiceImpl(repo))
 }

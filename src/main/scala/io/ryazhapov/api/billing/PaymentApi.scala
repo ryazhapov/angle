@@ -6,8 +6,8 @@ import io.ryazhapov.domain.accounts.Role.TeacherRole
 import io.ryazhapov.domain.auth.UserWithSession
 import io.ryazhapov.domain.billing.Payment
 import io.ryazhapov.errors.UnauthorizedAction
-import io.ryazhapov.services.accounts.TeacherService
 import io.ryazhapov.services.accounts.TeacherService.TeacherService
+import io.ryazhapov.services.accounts.{StudentService, TeacherService}
 import io.ryazhapov.services.billing.PaymentService
 import io.ryazhapov.services.billing.PaymentService.PaymentService
 import io.ryazhapov.services.lessons.LessonService
@@ -30,6 +30,7 @@ class PaymentApi[R <: Api.DefaultApiEnv with PaymentService with LessonService w
             _ <- log.info(s"Creating payment for lesson {$lessonId")
             foundLesson <- LessonService.getLesson(lessonId)
             foundTeacher <- TeacherService.getTeacher(user.id)
+            foundStudent <- StudentService.getStudent(foundLesson.studentId)
             _ <- ZIO.when(user.id == foundLesson.teacherId)(ZIO.fail(UnauthorizedAction))
             id <- zio.random.nextUUID
             payment = Payment(
@@ -39,8 +40,12 @@ class PaymentApi[R <: Api.DefaultApiEnv with PaymentService with LessonService w
               foundLesson.id,
               foundTeacher.rate
             )
-            result <- PaymentService.createPayment(payment)
-            _ <- LessonService.completeLesson(lessonId)
+            updatedTeacher = foundTeacher.copy(balance = foundTeacher.balance + foundTeacher.rate)
+            updatedStudent = foundStudent.copy(balance = foundStudent.balance - foundTeacher.rate)
+            result <- TeacherService.updateTeacher(updatedTeacher) *>
+              StudentService.updateStudent(updatedStudent) *>
+              LessonService.completeLesson(lessonId) *>
+              PaymentService.createPayment(payment)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,

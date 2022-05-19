@@ -10,6 +10,8 @@ object WithdrawalRepository extends Repository {
   import dbContext._
 
   type WithdrawalRepository = Has[Service]
+  lazy val live: ULayer[WithdrawalRepository] =
+    ZLayer.succeed(new ServiceImpl())
 
   trait Service {
     def create(withdrawal: Withdrawal): Result[Unit]
@@ -37,7 +39,4 @@ object WithdrawalRepository extends Repository {
         .filter(_.teacherId == lift(teacherId))
       )
   }
-
-  lazy val live: ULayer[WithdrawalRepository] =
-    ZLayer.succeed(new ServiceImpl())
 }

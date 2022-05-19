@@ -14,6 +14,8 @@ object UserRepository extends Repository {
 
   private implicit val encodeRole: MappedEncoding[Role, String] = MappedEncoding[Role, String](_.toString)
   private implicit val decodeRole: MappedEncoding[String, Role] = MappedEncoding[String, Role](Role.fromString)
+  lazy val live: ULayer[UserRepository.UserRepository] =
+    ZLayer.succeed(new ServiceImpl())
 
   trait Service {
     def create(user: User): Result[Unit]
@@ -86,7 +88,4 @@ object UserRepository extends Repository {
         .delete
       ).unit
   }
-
-  lazy val live: ULayer[UserRepository.UserRepository] =
-    ZLayer.succeed(new ServiceImpl())
 }

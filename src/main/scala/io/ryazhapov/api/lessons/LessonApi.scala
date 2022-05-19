@@ -5,10 +5,10 @@ import io.ryazhapov.api.Api
 import io.ryazhapov.database.services.TransactorService.DBTransactor
 import io.ryazhapov.domain.UserId
 import io.ryazhapov.domain.accounts.Role
-import io.ryazhapov.domain.accounts.Role.StudentRole
+import io.ryazhapov.domain.accounts.Role.{AdminRole, StudentRole}
 import io.ryazhapov.domain.auth.UserWithSession
 import io.ryazhapov.domain.lessons.Lesson
-import io.ryazhapov.errors.{LessonOverlapping, ScheduleNotFound}
+import io.ryazhapov.errors.{LessonOverlapping, ScheduleNotFound, UnauthorizedAction}
 import io.ryazhapov.services.accounts.TeacherService
 import io.ryazhapov.services.accounts.TeacherService.TeacherService
 import io.ryazhapov.services.lessons.LessonService.LessonService
@@ -25,18 +25,6 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
   TeacherService with ScheduleService] extends Api[R] {
 
   import dsl._
-
-  case class LessonRequest(
-    teacherId: UserId,
-    startsAt: ZonedDateTime,
-    endsAt: ZonedDateTime
-  )
-
-  def checkOverlapping(lesson: Lesson): ZIO[LessonService with DBTransactor, Throwable, Unit] =
-    LessonService.isOverlapping(lesson).flatMap {
-      case true  => ZIO.fail(LessonOverlapping)
-      case false => ZIO.succeed(())
-    }
 
   val lessonRoutes: AuthedRoutes[UserWithSession, ApiTask] = AuthedRoutes.of[UserWithSession, ApiTask] {
 
@@ -114,40 +102,70 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
       }
 
     case GET -> Root as UserWithSession(user, session) =>
-      val handleRequest = for {
-        _ <- log.info(s"Getting lesson for ${user.role} ${user.id}")
-        result <- LessonService.getLessonsByUser(user)
-      } yield result
-      handleRequest.foldM(
-        throwableToHttpCode,
-        result => okWithCookie(result, session.id)
-      )
+      user.role match {
+        case AdminRole => IO(Response(MethodNotAllowed))
+
+        case _ =>
+          val handleRequest = for {
+            _ <- log.info(s"Getting lesson for ${user.role} ${user.id}")
+            result <- LessonService.getLessonsByUser(user)
+          } yield result
+          handleRequest.foldM(
+            throwableToHttpCode,
+            result => okWithCookie(result, session.id)
+          )
+      }
+
 
     case GET -> Root :? CompletedParamMatcher(completed) as UserWithSession(user, session) =>
-      val handleRequest = for {
-        _ <- if (completed) {
-          log.info(s"Getting completed lessons for ${user.role} ${user.id}")
-        } else {
-          log.info(s"Getting upcoming lesson for ${user.role} ${user.id}")
-        }
-        result <- LessonService.getLessonsByUserWithFilter(user, completed)
-      } yield result
-      handleRequest.foldM(
-        throwableToHttpCode,
-        result => okWithCookie(result, session.id)
-      )
+      user.role match {
+        case AdminRole => IO(Response(MethodNotAllowed))
 
-    case DELETE -> Root / UUIDVar(id) as UserWithSession(_, session) =>
-      val handleRequest = for {
-        _ <- log.info(s"Deleting lesson $id")
-        result <- LessonService.deleteLesson(id)
-      } yield result
-      handleRequest.foldM(
-        throwableToHttpCode,
-        result => okWithCookie(result, session.id)
-      )
+        case _ =>
+          val handleRequest = for {
+            _ <- if (completed) {
+              log.info(s"Getting completed lessons for ${user.role} ${user.id}")
+            } else {
+              log.info(s"Getting upcoming lesson for ${user.role} ${user.id}")
+            }
+            result <- LessonService.getLessonsByUserWithFilter(user, completed)
+          } yield result
+          handleRequest.foldM(
+            throwableToHttpCode,
+            result => okWithCookie(result, session.id)
+          )
+      }
+
+    case DELETE -> Root / UUIDVar(id) as UserWithSession(user, session) =>
+      user.role match {
+        case AdminRole => IO(Response(MethodNotAllowed))
+
+        case _ =>
+          val handleRequest = for {
+            _ <- log.info(s"Deleting lesson $id")
+            foundLesson <- LessonService.getLesson(id)
+            _ <- ZIO.when(!(user.id != foundLesson.teacherId || user.id != foundLesson.studentId))(ZIO.fail(UnauthorizedAction))
+            result <- LessonService.deleteLesson(id)
+          } yield result
+          handleRequest.foldM(
+            throwableToHttpCode,
+            result => okWithCookie(result, session.id)
+          )
+      }
   }
+
+  def checkOverlapping(lesson: Lesson): ZIO[LessonService with DBTransactor, Throwable, Unit] =
+    LessonService.isOverlapping(lesson).flatMap {
+      case true  => ZIO.fail(LessonOverlapping)
+      case false => ZIO.succeed(())
+    }
 
   override def routes: HttpRoutes[ApiTask] =
     authMiddleware(lessonRoutes)
+
+  case class LessonRequest(
+    teacherId: UserId,
+    startsAt: ZonedDateTime,
+    endsAt: ZonedDateTime
+  )
 }

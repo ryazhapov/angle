@@ -14,6 +14,8 @@ import zio.{Has, RIO, ZLayer}
 object ReplenishmentService {
 
   type ReplenishmentService = Has[Service]
+  lazy val live: ZLayer[ReplenishmentRepository, Nothing, ReplenishmentService] =
+    ZLayer.fromService[ReplenishmentRepository.Service, ReplenishmentService.Service](repo => new ServiceImpl(repo))
 
   trait Service {
     def createReplenishment(replenishment: Replenishment): RIO[DBTransactor, Unit]
@@ -47,7 +49,4 @@ object ReplenishmentService {
         replenishment <- replenishmentRepository.getByStudent(studentId).transact(transactor)
       } yield replenishment
   }
-
-  lazy val live: ZLayer[ReplenishmentRepository, Nothing, ReplenishmentService] =
-    ZLayer.fromService[ReplenishmentRepository.Service, ReplenishmentService.Service](repo => new ServiceImpl(repo))
 }

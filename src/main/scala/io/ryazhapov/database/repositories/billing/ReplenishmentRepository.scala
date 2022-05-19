@@ -10,6 +10,8 @@ object ReplenishmentRepository extends Repository {
   import dbContext._
 
   type ReplenishmentRepository = Has[Service]
+  lazy val live: ULayer[ReplenishmentRepository] =
+    ZLayer.succeed(new ServiceImpl())
 
   trait Service {
     def create(replenishment: Replenishment): Result[Unit]
@@ -37,7 +39,4 @@ object ReplenishmentRepository extends Repository {
         .filter(_.studentId == lift(studentId))
       )
   }
-
-  lazy val live: ULayer[ReplenishmentRepository] =
-    ZLayer.succeed(new ServiceImpl())
 }

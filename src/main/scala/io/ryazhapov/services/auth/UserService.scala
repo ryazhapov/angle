@@ -20,6 +20,10 @@ import java.util.UUID
 object UserService {
 
   type UserService = Has[Service]
+  lazy val live: RLayer[UserRepository with SessionRepository, UserService] =
+    ZLayer.fromServices[UserRepository.Service, SessionRepository.Service, UserService.Service] {
+      (usersRepo, sessionsRepo) => new ServiceImpl(usersRepo, sessionsRepo)
+    }
 
   trait Service {
     def createUser(user: User): RIO[DBTransactor, Unit]
@@ -157,9 +161,4 @@ object UserService {
         _ <- sessionsRepository.delete(id).transact(transactor)
       } yield ()
   }
-
-  lazy val live: RLayer[UserRepository with SessionRepository, UserService] =
-    ZLayer.fromServices[UserRepository.Service, SessionRepository.Service, UserService.Service] {
-      (usersRepo, sessionsRepo) => new ServiceImpl(usersRepo, sessionsRepo)
-    }
 }

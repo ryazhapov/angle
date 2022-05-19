@@ -2,8 +2,8 @@ package io.ryazhapov.api.accounts
 
 import io.circe.generic.auto._
 import io.ryazhapov.api.Api
+import io.ryazhapov.domain.accounts.Admin
 import io.ryazhapov.domain.accounts.Role.AdminRole
-import io.ryazhapov.domain.accounts.{Admin, Role}
 import io.ryazhapov.domain.auth.UserWithSession
 import io.ryazhapov.services.accounts.AdminService
 import io.ryazhapov.services.accounts.AdminService.AdminService

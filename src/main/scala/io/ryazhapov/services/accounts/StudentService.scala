@@ -15,6 +15,8 @@ import zio.{Has, RIO, ZIO, ZLayer}
 object StudentService {
 
   type StudentService = Has[Service]
+  lazy val live: ZLayer[StudentRepository, Nothing, StudentService] =
+    ZLayer.fromService[StudentRepository.Service, StudentService.Service](repo => new ServiceImpl(repo))
 
   trait Service {
     def createStudent(student: Student): RIO[DBTransactor, Unit]
@@ -66,7 +68,4 @@ object StudentService {
         _ <- studentRepository.delete(id).transact(transactor).unit
       } yield ()
   }
-
-  lazy val live: ZLayer[StudentRepository, Nothing, StudentService] =
-    ZLayer.fromService[StudentRepository.Service, StudentService.Service](repo => new ServiceImpl(repo))
 }

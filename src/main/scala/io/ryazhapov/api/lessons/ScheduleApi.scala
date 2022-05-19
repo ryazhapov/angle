@@ -20,17 +20,6 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
 
   import dsl._
 
-  case class ScheduleRequest(
-    startsAt: ZonedDateTime,
-    endsAt: ZonedDateTime
-  )
-
-  def checkOverlapping(schedule: Schedule): ZIO[ScheduleService with DBTransactor, Throwable, Unit] =
-    ScheduleService.isOverlapping(schedule).flatMap {
-      case true  => ZIO.fail(ScheduleOverlapping)
-      case false => ZIO.succeed(())
-    }
-
   val scheduleRoutes: AuthedRoutes[UserWithSession, ApiTask] = AuthedRoutes.of[UserWithSession, ApiTask] {
 
     case authReq @ POST -> Root / "create" as UserWithSession(user, session) =>
@@ -132,6 +121,17 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
       }
   }
 
+  def checkOverlapping(schedule: Schedule): ZIO[ScheduleService with DBTransactor, Throwable, Unit] =
+    ScheduleService.isOverlapping(schedule).flatMap {
+      case true  => ZIO.fail(ScheduleOverlapping)
+      case false => ZIO.succeed(())
+    }
+
   override def routes: HttpRoutes[ApiTask] =
     authMiddleware(scheduleRoutes)
+
+  case class ScheduleRequest(
+    startsAt: ZonedDateTime,
+    endsAt: ZonedDateTime
+  )
 }
