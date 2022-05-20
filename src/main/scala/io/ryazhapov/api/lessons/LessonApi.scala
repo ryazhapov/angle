@@ -8,9 +8,9 @@ import io.ryazhapov.domain.accounts.Role
 import io.ryazhapov.domain.accounts.Role.{AdminRole, StudentRole}
 import io.ryazhapov.domain.auth.UserWithSession
 import io.ryazhapov.domain.lessons.Lesson
-import io.ryazhapov.errors.{LessonOverlapping, ScheduleNotFound, UnauthorizedAction}
-import io.ryazhapov.services.accounts.TeacherService
+import io.ryazhapov.errors.{LessonOverlapping, NotEnoughMoney, ScheduleNotFound, UnauthorizedAction}
 import io.ryazhapov.services.accounts.TeacherService.TeacherService
+import io.ryazhapov.services.accounts.{StudentService, TeacherService}
 import io.ryazhapov.services.lessons.LessonService.LessonService
 import io.ryazhapov.services.lessons.ScheduleService.ScheduleService
 import io.ryazhapov.services.lessons.{LessonService, ScheduleService}
@@ -34,8 +34,10 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
         case StudentRole =>
           val handleRequest = for {
             request <- authReq.req.as[LessonRequest]
+            foundStudent <- StudentService.getStudent(user.id)
             foundTeacher <- TeacherService.getTeacher(request.teacherId)
-            _ <- log.info(s"Creating lesson for Student:${user.id} and Teacher:$foundTeacher")
+            _ <- log.info(s"Creating lesson for Student:${user.id} and Teacher:${foundTeacher.userId}")
+            _ <- ZIO.when(foundStudent.balance >= foundTeacher.rate)(ZIO.fail(NotEnoughMoney))
             id <- zio.random.nextUUID
             lesson = Lesson(
               id,
@@ -50,7 +52,11 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
               case ::(_, _) => ZIO.succeed(())
               case Nil      => ZIO.fail(ScheduleNotFound)
             }
-            result <- LessonService.createLesson(lesson)
+            updatedStudent = foundStudent.copy(
+              balance = foundStudent.balance - foundTeacher.rate,
+              reserved = foundStudent.reserved + foundTeacher.rate
+            )
+            result <- StudentService.updateStudent(updatedStudent) *> LessonService.createLesson(lesson)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,
@@ -144,8 +150,15 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
           val handleRequest = for {
             _ <- log.info(s"Deleting lesson $id")
             foundLesson <- LessonService.getLesson(id)
-            _ <- ZIO.when(!(user.id != foundLesson.teacherId || user.id != foundLesson.studentId))(ZIO.fail(UnauthorizedAction))
-            result <- LessonService.deleteLesson(id)
+            _ <- ZIO.when(!(user.id != foundLesson.teacherId || user.id != foundLesson.studentId)
+            )(ZIO.fail(UnauthorizedAction))
+            foundStudent <- StudentService.getStudent(foundLesson.studentId)
+            foundTeacher <- TeacherService.getTeacher(foundLesson.teacherId)
+            updatedStudent = foundStudent.copy(
+              balance = foundStudent.balance + foundTeacher.rate,
+              reserved = foundStudent.reserved - foundTeacher.rate
+            )
+            result <- StudentService.updateStudent(updatedStudent) *> LessonService.deleteLesson(id)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,

@@ -57,6 +57,9 @@
             <column name="balance" type="int" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
+            <column name="reserved" type="int" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
         <addForeignKeyConstraint baseTableName="Student"
                                  baseColumnNames="userId"
@@ -112,8 +115,8 @@
         <addForeignKeyConstraint baseTableName="Schedule"
                                  baseColumnNames="teacherId"
                                  constraintName="FK_SCHEDULE_TEACHER_ID"
-                                 referencedColumnNames="id"
-                                 referencedTableName="User"
+                                 referencedColumnNames="userId"
+                                 referencedTableName="Teacher"
                                  onDelete="CASCADE"
         />
     </changeSet>
@@ -142,15 +145,15 @@
         <addForeignKeyConstraint baseTableName="Lesson"
                                  baseColumnNames="teacherId"
                                  constraintName="FK_LESSON_TEACHER_ID"
-                                 referencedColumnNames="id"
-                                 referencedTableName="User"
+                                 referencedColumnNames="userId"
+                                 referencedTableName="Teacher"
                                  onDelete="CASCADE"
         />
         <addForeignKeyConstraint baseTableName="Lesson"
                                  baseColumnNames="studentId"
                                  constraintName="FK_LESSON_STUDENT_ID"
-                                 referencedColumnNames="id"
-                                 referencedTableName="User"
+                                 referencedColumnNames="userId"
+                                 referencedTableName="Student"
                                  onDelete="CASCADE"
         />
         <addUniqueConstraint
@@ -180,8 +183,8 @@
         <addForeignKeyConstraint baseTableName="Replenishment"
                                  baseColumnNames="studentId"
                                  constraintName="FK_REPLENISHMENT_STUDENT_ID"
-                                 referencedColumnNames="id"
-                                 referencedTableName="User"
+                                 referencedColumnNames="userId"
+                                 referencedTableName="Student"
                                  onDelete="CASCADE"
         />
     </changeSet>
@@ -201,8 +204,8 @@
         <addForeignKeyConstraint baseTableName="Withdrawal"
                                  baseColumnNames="teacherId"
                                  constraintName="FK_WITHDRAWAL_TEACHER_ID"
-                                 referencedColumnNames="id"
-                                 referencedTableName="User"
+                                 referencedColumnNames="userId"
+                                 referencedTableName="Teacher"
                                  onDelete="CASCADE"
         />
     </changeSet>
@@ -218,6 +221,9 @@
             <column name="teacherId" type="uuid">
                 <constraints nullable="false"/>
             </column>
+            <column name="lessonId" type="uuid">
+                <constraints nullable="false"/>
+            </column>
             <column name="amount" type="int">
                 <constraints nullable="false"/>
             </column>
@@ -225,15 +231,22 @@
         <addForeignKeyConstraint baseTableName="Payment"
                                  baseColumnNames="studentId"
                                  constraintName="FK_PAYMENT_STUDENT_ID"
-                                 referencedColumnNames="id"
-                                 referencedTableName="User"
+                                 referencedColumnNames="userId"
+                                 referencedTableName="Student"
                                  onDelete="CASCADE"
         />
         <addForeignKeyConstraint baseTableName="Payment"
                                  baseColumnNames="teacherId"
                                  constraintName="FK_PAYMENT_TEACHER_ID"
+                                 referencedColumnNames="userId"
+                                 referencedTableName="Teacher"
+                                 onDelete="CASCADE"
+        />
+        <addForeignKeyConstraint baseTableName="Payment"
+                                 baseColumnNames="lessonId"
+                                 constraintName="FK_PAYMENT_LESSON_ID"
                                  referencedColumnNames="id"
-                                 referencedTableName="User"
+                                 referencedTableName="Lesson"
                                  onDelete="CASCADE"
         />
     </changeSet>

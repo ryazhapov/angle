@@ -16,6 +16,7 @@ trait ErrorMapping[R <: Api.DefaultApiEnv] {
       case IncorrectUserPassword => BadRequest(e.getMessage)
       case InvalidScheduleTime   => BadRequest(e.getMessage)
       case InvalidLessonTime     => BadRequest(e.getMessage)
+      case NotEnoughMoney        => BadRequest(e.getMessage)
 
       case UserAlreadyExists    => Conflict(e.getMessage)
       case TeacherAlreadyExists => Conflict(e.getMessage)

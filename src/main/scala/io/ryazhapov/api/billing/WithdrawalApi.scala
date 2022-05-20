@@ -5,12 +5,13 @@ import io.ryazhapov.api.Api
 import io.ryazhapov.domain.accounts.Role.{AdminRole, TeacherRole}
 import io.ryazhapov.domain.auth.UserWithSession
 import io.ryazhapov.domain.billing.Withdrawal
+import io.ryazhapov.errors.NotEnoughMoney
 import io.ryazhapov.services.accounts.TeacherService
 import io.ryazhapov.services.accounts.TeacherService.TeacherService
 import io.ryazhapov.services.billing.WithdrawalService
 import io.ryazhapov.services.billing.WithdrawalService.WithdrawalService
 import org.http4s.{AuthedRoutes, HttpRoutes, Response}
-import zio.IO
+import zio.{IO, ZIO}
 import zio.interop.catz._
 import zio.logging._
 
@@ -27,6 +28,7 @@ class WithdrawalApi[R <: Api.DefaultApiEnv with WithdrawalService with TeacherSe
             _ <- log.info(s"Creating withdrawal for ${user.id}")
             foundTeacher <- TeacherService.getTeacher(user.id)
             request <- authReq.req.as[WithdrawalRequest]
+            _ <- ZIO.when(foundTeacher.balance >= request.amount)(ZIO.fail(NotEnoughMoney))
             id <- zio.random.nextUUID
             withdrawal = Withdrawal(
               id,

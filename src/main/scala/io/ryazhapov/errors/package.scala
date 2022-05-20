@@ -47,4 +47,6 @@ package object errors {
   case object InvalidLessonTime extends AppError("Invalid lesson time: Duration is zero or negative")
 
   case object UnauthorizedAction extends AppError("Performing unauthorized actions")
+
+  case object NotEnoughMoney extends AppError("Not enough money on account to perform action")
 }
