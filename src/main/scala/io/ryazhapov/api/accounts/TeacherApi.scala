@@ -20,7 +20,7 @@ class TeacherApi[R <: Api.DefaultApiEnv with TeacherService] extends Api[R] {
 
     case authReq @ PUT -> Root / "update" / UUIDVar(id) as UserWithSession(user, session) =>
       user.role match {
-        case AdminRole | TeacherRole if id == user.id =>
+        case TeacherRole if id == user.id && user.verified =>
           val handleRequest = for {
             _ <- log.info(s"Updating teacher $id")
             request <- authReq.req.as[Teacher]

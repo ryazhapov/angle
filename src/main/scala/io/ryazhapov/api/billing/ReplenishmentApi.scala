@@ -7,6 +7,7 @@ import io.ryazhapov.domain.auth.UserWithSession
 import io.ryazhapov.domain.billing.Replenishment
 import io.ryazhapov.services.accounts.StudentService
 import io.ryazhapov.services.accounts.StudentService.StudentService
+import io.ryazhapov.services.auth.UserService
 import io.ryazhapov.services.billing.ReplenishmentService
 import io.ryazhapov.services.billing.ReplenishmentService.ReplenishmentService
 import org.http4s.{AuthedRoutes, HttpRoutes, Response}
@@ -34,7 +35,8 @@ class ReplenishmentApi[R <: Api.DefaultApiEnv with ReplenishmentService with Stu
               request.amount
             )
             updatedStudent = foundStudent.copy(balance = foundStudent.balance + request.amount)
-            result <- StudentService.updateStudent(updatedStudent) *>
+            result <- UserService.verifyUser(user.id) *>
+              StudentService.updateStudent(updatedStudent) *>
               ReplenishmentService.createReplenishment(replenishment)
           } yield result
           handleRequest.foldM(
@@ -47,7 +49,7 @@ class ReplenishmentApi[R <: Api.DefaultApiEnv with ReplenishmentService with Stu
 
     case GET -> Root as UserWithSession(user, session) =>
       user.role match {
-        case AdminRole   =>
+        case AdminRole if user.verified =>
           val handleRequest = for {
             _ <- log.info(s"Getting all replenishments")
             result <- ReplenishmentService.getAllReplenishments

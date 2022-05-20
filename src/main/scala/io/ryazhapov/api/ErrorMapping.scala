@@ -12,11 +12,13 @@ trait ErrorMapping[R <: Api.DefaultApiEnv] {
 
   def throwableToHttpCode(e: Throwable): ApiTask[Response[ApiTask]] = {
     val resultCode = e match {
-      case SessionCookieIsAbsent => BadRequest(e.getMessage)
-      case IncorrectUserPassword => BadRequest(e.getMessage)
-      case InvalidScheduleTime   => BadRequest(e.getMessage)
-      case InvalidLessonTime     => BadRequest(e.getMessage)
-      case NotEnoughMoney        => BadRequest(e.getMessage)
+      case SessionCookieIsAbsent   => BadRequest(e.getMessage)
+      case IncorrectUserPassword   => BadRequest(e.getMessage)
+      case InvalidScheduleTime     => BadRequest(e.getMessage)
+      case InvalidLessonTime       => BadRequest(e.getMessage)
+      case NotEnoughMoney          => BadRequest(e.getMessage)
+      case UnauthorizedAction      => BadRequest(e.getMessage)
+      case DeletingCompletedLesson => BadRequest(e.getMessage)
 
       case UserAlreadyExists    => Conflict(e.getMessage)
       case TeacherAlreadyExists => Conflict(e.getMessage)
@@ -37,8 +39,6 @@ trait ErrorMapping[R <: Api.DefaultApiEnv] {
       case ReplenishmentNotFound => NotFound(e.getMessage)
       case PaymentNotFound       => NotFound(e.getMessage)
       case WithdrawalNotFound    => NotFound(e.getMessage)
-
-      case UnauthorizedAction => BadRequest(e.getMessage)
 
       case _ => InternalServerError(e.getMessage)
     }

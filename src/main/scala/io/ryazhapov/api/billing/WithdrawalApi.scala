@@ -23,7 +23,7 @@ class WithdrawalApi[R <: Api.DefaultApiEnv with WithdrawalService with TeacherSe
 
     case authReq @ PUT -> Root / "create" as UserWithSession(user, session) =>
       user.role match {
-        case TeacherRole =>
+        case TeacherRole if user.verified =>
           val handleRequest = for {
             _ <- log.info(s"Creating withdrawal for ${user.id}")
             foundTeacher <- TeacherService.getTeacher(user.id)

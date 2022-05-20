@@ -22,7 +22,7 @@ class AdminApi[R <: Api.DefaultApiEnv with AdminService with UserService] extend
 
     case authReq @ PUT -> Root / "update" / UUIDVar(id) as UserWithSession(user, session) =>
       user.role match {
-        case AdminRole =>
+        case AdminRole if user.verified =>
 
           val handleRequest = for {
             _ <- log.info(s"Updating admin $id")
@@ -91,7 +91,7 @@ class AdminApi[R <: Api.DefaultApiEnv with AdminService with UserService] extend
 
     case PUT -> Root / "verify" / UUIDVar(id) as UserWithSession(user, session) =>
       user.role match {
-        case AdminRole =>
+        case AdminRole if user.verified =>
 
           val handleRequest = for {
             _ <- log.info(s"Verifying user $id")

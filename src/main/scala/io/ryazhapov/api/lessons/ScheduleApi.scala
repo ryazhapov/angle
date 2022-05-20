@@ -25,7 +25,7 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
     case authReq @ POST -> Root / "create" as UserWithSession(user, session) =>
       user.role match {
 
-        case TeacherRole =>
+        case TeacherRole if user.verified =>
           val handleRequest = for {
             _ <- log.info(s"Creating schedule for ${user.id}")
             request <- authReq.req.as[ScheduleRequest]
@@ -50,7 +50,7 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
     case authReq @ PUT -> Root / "update" :? ScheduleIdParamMatcher(id) as UserWithSession(user, session) =>
       user.role match {
 
-        case TeacherRole =>
+        case TeacherRole if user.verified =>
           val handleRequest = for {
             request <- authReq.req.as[ScheduleRequest]
             _ <- log.info(s"Updating schedule for ${user.id}")
@@ -105,7 +105,7 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
     case DELETE -> Root / UUIDVar(id) as UserWithSession(user, session) =>
       user.role match {
 
-        case TeacherRole =>
+        case TeacherRole if user.verified =>
           val handleRequest = for {
             _ <- log.info(s"Deleting schedule $id")
             found <- ScheduleService.getSchedule(id)

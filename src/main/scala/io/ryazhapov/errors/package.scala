@@ -48,5 +48,7 @@ package object errors {
 
   case object UnauthorizedAction extends AppError("Performing unauthorized actions")
 
+  case object DeletingCompletedLesson extends AppError("Deleting already completed lesson")
+
   case object NotEnoughMoney extends AppError("Not enough money on account to perform action")
 }

@@ -8,7 +8,7 @@ import io.ryazhapov.domain.accounts.Role
 import io.ryazhapov.domain.accounts.Role.{AdminRole, StudentRole}
 import io.ryazhapov.domain.auth.UserWithSession
 import io.ryazhapov.domain.lessons.Lesson
-import io.ryazhapov.errors.{LessonOverlapping, NotEnoughMoney, ScheduleNotFound, UnauthorizedAction}
+import io.ryazhapov.errors.{DeletingCompletedLesson, LessonOverlapping, NotEnoughMoney, ScheduleNotFound, UnauthorizedAction}
 import io.ryazhapov.services.accounts.TeacherService.TeacherService
 import io.ryazhapov.services.accounts.{StudentService, TeacherService}
 import io.ryazhapov.services.lessons.LessonService.LessonService
@@ -31,7 +31,7 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
     case authReq @ POST -> Root / "create" as UserWithSession(user, session) =>
       user.role match {
 
-        case StudentRole =>
+        case StudentRole if user.verified =>
           val handleRequest = for {
             request <- authReq.req.as[LessonRequest]
             foundStudent <- StudentService.getStudent(user.id)
@@ -146,10 +146,11 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
       user.role match {
         case AdminRole => IO(Response(MethodNotAllowed))
 
-        case _ =>
+        case _ if user.verified =>
           val handleRequest = for {
             _ <- log.info(s"Deleting lesson $id")
             foundLesson <- LessonService.getLesson(id)
+            _ <- ZIO.when(!foundLesson.completed)(ZIO.fail(DeletingCompletedLesson))
             _ <- ZIO.when(!(user.id != foundLesson.teacherId || user.id != foundLesson.studentId)
             )(ZIO.fail(UnauthorizedAction))
             foundStudent <- StudentService.getStudent(foundLesson.studentId)

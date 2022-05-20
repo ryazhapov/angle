@@ -25,7 +25,7 @@ class PaymentApi[R <: Api.DefaultApiEnv with PaymentService with LessonService w
 
     case POST -> Root / "lesson_completed" :? LessonIdParamMatcher(lessonId) as UserWithSession(user, session) =>
       user.role match {
-        case TeacherRole =>
+        case TeacherRole if user.verified =>
           val handleRequest = for {
             _ <- log.info(s"Creating payment for lesson {$lessonId")
             foundLesson <- LessonService.getLesson(lessonId)
