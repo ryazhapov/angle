@@ -34,10 +34,9 @@ class ReplenishmentApi[R <: Api.DefaultApiEnv with ReplenishmentService with Stu
               user.id,
               request.amount
             )
-            updatedStudent = foundStudent.copy(balance = foundStudent.balance + request.amount)
-            result <- UserService.verifyUser(user.id) *>
-              StudentService.updateStudent(updatedStudent) *>
-              ReplenishmentService.createReplenishment(replenishment)
+            updStudent = foundStudent.copy(balance = foundStudent.balance + request.amount)
+            updUser = user.copy(verified = true)
+            result <- ReplenishmentService.createReplenishment(updUser, updStudent, replenishment)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,

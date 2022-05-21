@@ -49,6 +49,7 @@ object UserRepository extends Repository {
 
     override def update(user: User): Result[Unit] =
       dbContext.run(userTable
+        .filter(_.id == lift(user.id))
         .update(lift(user))
       ).unit
 

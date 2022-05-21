@@ -56,6 +56,7 @@ object Dependencies {
   )
 
   lazy val security: Seq[ModuleID] = Seq(
-    "commons-codec" % "commons-codec" % CommonsCodecVersion
+    "commons-codec" % "commons-codec" % CommonsCodecVersion,
+    "org.testcontainers" % "postgresql" % "1.16.2" % Test
   )
 }

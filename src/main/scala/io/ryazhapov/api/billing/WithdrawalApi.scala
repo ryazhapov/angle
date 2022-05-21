@@ -35,9 +35,8 @@ class WithdrawalApi[R <: Api.DefaultApiEnv with WithdrawalService with TeacherSe
               user.id,
               request.amount
             )
-            updatedTeacher = foundTeacher.copy(balance = foundTeacher.balance - request.amount)
-            result <- TeacherService.updateTeacher(updatedTeacher) *>
-              WithdrawalService.createWithdrawal(withdrawal)
+            updTeacher = foundTeacher.copy(balance = foundTeacher.balance - request.amount)
+            result <- WithdrawalService.createWithdrawal(updTeacher, withdrawal)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,

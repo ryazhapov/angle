@@ -22,7 +22,7 @@ object UserService {
   type UserService = Has[Service]
   lazy val live: RLayer[UserRepository with SessionRepository, UserService] =
     ZLayer.fromServices[UserRepository.Service, SessionRepository.Service, UserService.Service] {
-      (usersRepo, sessionsRepo) => new ServiceImpl(usersRepo, sessionsRepo)
+      (userRepo, sessionRepo) => new ServiceImpl(userRepo, sessionRepo)
     }
 
   trait Service {

@@ -40,12 +40,10 @@ class PaymentApi[R <: Api.DefaultApiEnv with PaymentService with LessonService w
               foundLesson.id,
               foundTeacher.rate
             )
-            updatedTeacher = foundTeacher.copy(balance = foundTeacher.balance + foundTeacher.rate)
-            updatedStudent = foundStudent.copy(balance = foundStudent.balance - foundTeacher.rate)
-            result <- TeacherService.updateTeacher(updatedTeacher) *>
-              StudentService.updateStudent(updatedStudent) *>
-              LessonService.completeLesson(lessonId) *>
-              PaymentService.createPayment(payment)
+            updStudent = foundStudent.copy(balance = foundStudent.balance - foundTeacher.rate)
+            updTeacher = foundTeacher.copy(balance = foundTeacher.balance + foundTeacher.rate)
+            updLesson = foundLesson.copy(completed = true)
+            result <- PaymentService.createPayment(updStudent, updTeacher, updLesson, payment)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,

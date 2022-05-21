@@ -1,25 +1,38 @@
 package io.ryazhapov.services.billing
 
+import io.ryazhapov.database.repositories.accounts.StudentRepository.StudentRepository
+import io.ryazhapov.database.repositories.accounts.TeacherRepository.TeacherRepository
+import io.ryazhapov.database.repositories.accounts.{StudentRepository, TeacherRepository}
 import io.ryazhapov.database.repositories.billing.PaymentRepository
 import io.ryazhapov.database.repositories.billing.PaymentRepository.PaymentRepository
+import io.ryazhapov.database.repositories.lessons.LessonRepository
+import io.ryazhapov.database.repositories.lessons.LessonRepository.LessonRepository
 import io.ryazhapov.database.services.TransactorService
 import io.ryazhapov.database.services.TransactorService.DBTransactor
+import io.ryazhapov.domain.accounts.{Student, Teacher}
 import io.ryazhapov.domain.billing.Payment
+import io.ryazhapov.domain.lessons.Lesson
 import io.ryazhapov.domain.{LessonId, PaymentId, UserId}
 import io.ryazhapov.errors.PaymentNotFound
 import zio.interop.catz._
 import zio.macros.accessible
-import zio.{Has, RIO, ZIO, ZLayer}
+import zio.{Has, RIO, RLayer, ZIO, ZLayer}
 
 @accessible
 object PaymentService {
 
   type PaymentService = Has[Service]
-  lazy val live: ZLayer[PaymentRepository, Nothing, PaymentService] =
-    ZLayer.fromService[PaymentRepository.Service, PaymentService.Service](repo => new ServiceImpl(repo))
+
+  lazy val live: RLayer[StudentRepository with TeacherRepository with
+    LessonRepository with PaymentRepository, PaymentService] = ZLayer.fromServices[
+    StudentRepository.Service, TeacherRepository.Service,
+    LessonRepository.Service, PaymentRepository.Service, PaymentService.Service] {
+    (studentRepo, teacherRepo, lessonRepo, paymentRepo) =>
+      new ServiceImpl(studentRepo, teacherRepo, lessonRepo, paymentRepo)
+  }
 
   trait Service {
-    def createPayment(payment: Payment): RIO[DBTransactor, Unit]
+    def createPayment(student: Student, teacher: Teacher, lesson: Lesson, payment: Payment): RIO[DBTransactor, Unit]
 
     def getPayment(id: PaymentId): RIO[DBTransactor, Payment]
 
@@ -33,16 +46,31 @@ object PaymentService {
   }
 
   class ServiceImpl(
+    studentRepository: StudentRepository.Service,
+    teacherRepository: TeacherRepository.Service,
+    lessonRepository: LessonRepository.Service,
     paymentRepository: PaymentRepository.Service
   ) extends Service {
 
     import doobie.implicits._
 
-    override def createPayment(payment: Payment): RIO[DBTransactor, Unit] =
+    override def createPayment(
+      student: Student,
+      teacher: Teacher, lesson: Lesson,
+      payment: Payment): RIO[DBTransactor, Unit] = {
+
+      val action = for {
+        _ <- studentRepository.update(student)
+        _ <- teacherRepository.update(teacher)
+        _ <- lessonRepository.update(lesson)
+        _ <- paymentRepository.create(payment)
+      } yield ()
+
       for {
         transactor <- TransactorService.databaseTransactor
-        _ <- paymentRepository.create(payment).transact(transactor).unit
+        _ <- action.transact(transactor)
       } yield ()
+    }
 
     override def getPayment(id: PaymentId): RIO[DBTransactor, Payment] =
       for {
