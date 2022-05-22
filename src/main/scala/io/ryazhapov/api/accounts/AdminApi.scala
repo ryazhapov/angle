@@ -20,7 +20,7 @@ class AdminApi[R <: Api.DefaultApiEnv with AdminService with UserService] extend
 
   val adminRoutes: AuthedRoutes[UserWithSession, ApiTask] = AuthedRoutes.of[UserWithSession, ApiTask] {
 
-    case authReq @ PUT -> Root / "update" / UUIDVar(id) as UserWithSession(user, session) =>
+    case authReq @ PUT -> Root / "update" / IntVar(id) as UserWithSession(user, session) =>
       user.role match {
         case AdminRole if user.verified =>
 
@@ -41,7 +41,7 @@ class AdminApi[R <: Api.DefaultApiEnv with AdminService with UserService] extend
       }
 
 
-    case GET -> Root / UUIDVar(id) as UserWithSession(user, session) =>
+    case GET -> Root / IntVar(id) as UserWithSession(user, session) =>
       user.role match {
         case AdminRole =>
 
@@ -89,7 +89,7 @@ class AdminApi[R <: Api.DefaultApiEnv with AdminService with UserService] extend
         case _ => IO(Response(Unauthorized))
       }
 
-    case PUT -> Root / "verify" / UUIDVar(id) as UserWithSession(user, session) =>
+    case PUT -> Root / "verify" / IntVar(id) as UserWithSession(user, session) =>
       user.role match {
         case AdminRole if user.verified =>
 

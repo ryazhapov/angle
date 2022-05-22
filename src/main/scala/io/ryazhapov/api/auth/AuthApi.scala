@@ -27,13 +27,12 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
       val requestHandler = for {
         apiUser <- req.as[SignUpUser]
         _ <- log.info(s"Sign up attempt email = ${apiUser.email}")
-        id <- zio.random.nextUUID
         _ <- UserService.userExists(apiUser.email).flatMap {
           case true  => ZIO.fail(UserAlreadyExists)
           case false => ZIO.succeed(())
         }
-        _ <- UserService.createUser(User(
-          id,
+        newId <- UserService.createUser(User(
+          0,
           apiUser.email,
           SecurityUtils.countSecretHash(apiUser.password, salt),
           salt,
@@ -41,13 +40,13 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
           if (apiUser.role == AdminRole) true else false
         ))
         _ <- apiUser.role match {
-          case AdminRole   => AdminService.createAdmin(Admin(userId = id))
-          case TeacherRole => TeacherService.createTeacher(Teacher(userId = id))
-          case StudentRole => StudentService.createStudent(Student(userId = id))
+          case AdminRole   => AdminService.createAdmin(Admin(userId = newId))
+          case TeacherRole => TeacherService.createTeacher(Teacher(userId = newId))
+          case StudentRole => StudentService.createStudent(Student(userId = newId))
         }
-        sessionId <- UserService.addSession(id)
+        sessionId <- UserService.addSession(newId)
         _ <- log.info(s"User with email = ${apiUser.email} signed up successfully")
-      } yield (id, sessionId)
+      } yield (newId, sessionId)
 
       requestHandler.foldM(
         throwableToHttpCode,
@@ -91,7 +90,7 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
         case _ => IO(Response(Unauthorized))
       }
 
-    case GET -> Root / "user" / UUIDVar(id) as UserWithSession(user, session) =>
+    case GET -> Root / "user" / IntVar(id) as UserWithSession(user, session) =>
       user.role match {
         case AdminRole => log.info("Get user") *>
           UserService.getUser(id).foldM(

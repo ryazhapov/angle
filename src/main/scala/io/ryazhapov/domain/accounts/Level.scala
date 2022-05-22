@@ -17,8 +17,8 @@ object Level {
 
   def toString(level: Level): String = level.toString
 
-  private implicit val encodeLevel: MappedEncoding[Level, String] = MappedEncoding[Level, String](_.toString)
-  private implicit val decodeLevel: MappedEncoding[String, Level] = MappedEncoding[String, Level](Level.fromString)
+  implicit val encodeLevel: MappedEncoding[Level, String] = MappedEncoding[Level, String](_.toString)
+  implicit val decodeLevel: MappedEncoding[String, Level] = MappedEncoding[String, Level](Level.fromString)
 
   implicit val decoder: Decoder[Level] = Decoder[String].emap {
     case "beginner"           => Right(Beginner)

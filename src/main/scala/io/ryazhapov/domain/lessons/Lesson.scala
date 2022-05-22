@@ -11,4 +11,7 @@ case class Lesson(
   startsAt: ZonedDateTime,
   endsAt: ZonedDateTime,
   completed: Boolean
-)
+) {
+  def valid: Boolean =
+    startsAt.isBefore(endsAt) && !startsAt.isEqual(endsAt)
+}

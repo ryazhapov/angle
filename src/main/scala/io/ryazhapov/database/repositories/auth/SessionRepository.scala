@@ -1,51 +1,60 @@
 package io.ryazhapov.database.repositories.auth
 
+import doobie.implicits._
+import doobie.util.transactor.Transactor
 import io.ryazhapov.database.repositories.Repository
+import io.ryazhapov.database.services.TransactorService.DBTransactor
 import io.ryazhapov.domain.{SessionId, UserId, auth}
-import zio.{Has, ULayer, ZLayer}
+import zio.interop.catz._
+import zio.{Has, Task, URLayer, ZLayer}
 
 object SessionRepository extends Repository {
 
   import dbContext._
 
   type SessionRepository = Has[Service]
-  lazy val live: ULayer[SessionRepository.SessionRepository] =
-    ZLayer.succeed(new ServiceImpl())
+
+  val live: URLayer[DBTransactor, SessionRepository] =
+    ZLayer.fromService(new PostgresSessionRepository(_))
 
   trait Service {
-    def insert(session: auth.Session): Result[Unit]
+    def insert(session: auth.Session): Task[SessionId]
 
-    def get(id: SessionId): Result[Option[auth.Session]]
+    def get(id: SessionId): Task[Option[auth.Session]]
 
-    def getByUser(userId: UserId): Result[List[auth.Session]]
+    def getByUser(userId: UserId): Task[List[auth.Session]]
 
-    def delete(id: SessionId): Result[Unit]
+    def delete(id: SessionId): Task[Unit]
   }
 
-  class ServiceImpl() extends Service {
-    lazy val sessionTable = quote {
-      querySchema[auth.Session](""""Session"""")
-    }
+  class PostgresSessionRepository(xa: Transactor[Task]) extends Service {
 
-    override def insert(session: auth.Session): Result[Unit] =
-      dbContext.run(sessionTable
-        .insert(lift(session))
-      ).unit
+    lazy val sessionTable = quote(querySchema[auth.Session](""""Session""""))
 
-    override def get(id: SessionId): Result[Option[auth.Session]] =
-      dbContext.run(sessionTable
-        .filter(_.id == lift(id))
-      ).map(_.headOption)
+    override def insert(session: auth.Session): Task[SessionId] =
+      dbContext.run {
+        sessionTable
+          .insert(lift(session))
+          .returningGenerated(_.id)
+      }.transact(xa)
 
-    override def getByUser(userId: UserId): Result[List[auth.Session]] =
-      dbContext.run(sessionTable
-        .filter(_.userId == lift(userId))
-      )
+    override def get(id: SessionId): Task[Option[auth.Session]] =
+      dbContext.run {
+        sessionTable
+          .filter(_.id == lift(id))
+      }.map(_.headOption).transact(xa)
 
-    override def delete(id: SessionId): Result[Unit] =
-      dbContext.run(sessionTable
-        .filter(_.id == lift(id))
-        .delete
-      ).unit
+    override def getByUser(userId: UserId): Task[List[auth.Session]] =
+      dbContext.run {
+        sessionTable
+          .filter(_.userId == lift(userId))
+      }.transact(xa)
+
+    override def delete(id: SessionId): Task[Unit] =
+      dbContext.run {
+        sessionTable
+          .filter(_.id == lift(id))
+          .delete
+      }.unit.transact(xa)
   }
 }

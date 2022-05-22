@@ -18,7 +18,7 @@ class StudentApi[R <: Api.DefaultApiEnv with StudentService] extends Api[R] {
 
   val studentRoutes: AuthedRoutes[UserWithSession, ApiTask] = AuthedRoutes.of[UserWithSession, ApiTask] {
 
-    case authReq @ PUT -> Root / "update" / UUIDVar(id) as UserWithSession(user, session) =>
+    case authReq @ PUT -> Root / "update" / IntVar(id) as UserWithSession(user, session) =>
       user.role match {
         case StudentRole if id == user.id && user.verified =>
           val handleRequest = for {
@@ -36,7 +36,7 @@ class StudentApi[R <: Api.DefaultApiEnv with StudentService] extends Api[R] {
         case _ => IO(Response(Unauthorized))
       }
 
-    case GET -> Root / UUIDVar(id) as UserWithSession(_, session) =>
+    case GET -> Root / IntVar(id) as UserWithSession(_, session) =>
       val handleRequest = for {
         _ <- log.info(s"Getting student $id")
         result <- StudentService.getStudent(id)

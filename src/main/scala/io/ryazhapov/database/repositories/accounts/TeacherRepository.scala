@@ -1,9 +1,13 @@
 package io.ryazhapov.database.repositories.accounts
 
+import doobie.implicits._
+import doobie.util.transactor.Transactor
 import io.ryazhapov.database.repositories.Repository
+import io.ryazhapov.database.services.TransactorService.DBTransactor
 import io.ryazhapov.domain.UserId
-import io.ryazhapov.domain.accounts.{Level, Teacher}
-import zio.{Has, ULayer, ZLayer}
+import io.ryazhapov.domain.accounts.Teacher
+import zio.interop.catz._
+import zio.{Has, Task, URLayer, ZLayer}
 
 object TeacherRepository extends Repository {
 
@@ -11,49 +15,52 @@ object TeacherRepository extends Repository {
 
   type TeacherRepository = Has[Service]
 
-  lazy val live: ULayer[TeacherRepository] =
-    ZLayer.succeed(new ServiceImpl())
+  lazy val live: URLayer[DBTransactor, TeacherRepository] =
+    ZLayer.fromService(new PostgresTeacherRepository(_))
 
   trait Service {
-    def create(teacher: Teacher): Result[Unit]
+    def create(teacher: Teacher): Task[Unit]
 
-    def update(teacher: Teacher): Result[Unit]
+    def update(teacher: Teacher): Task[Unit]
 
-    def get(id: UserId): Result[Option[Teacher]]
+    def get(id: UserId): Task[Option[Teacher]]
 
-    def getAll: Result[List[Teacher]]
+    def getAll: Task[List[Teacher]]
 
-    def delete(id: UserId): Result[Unit]
+    def delete(id: UserId): Task[Unit]
   }
 
-  class ServiceImpl() extends Service {
-    lazy val teacherTable = quote {
-      querySchema[Teacher](""""Teacher"""")
-    }
+  class PostgresTeacherRepository(xa: Transactor[Task]) extends Service {
 
-    override def create(teacher: Teacher): Result[Unit] =
-      dbContext.run(teacherTable
-        .insert(lift(teacher))
-      ).unit
+    lazy val teacherTable = quote(querySchema[Teacher](""""Teacher""""))
 
-    override def update(teacher: Teacher): Result[Unit] =
-      dbContext.run(teacherTable
-        .filter(_.userId == lift(teacher.userId))
-        .update(lift(teacher))
-      ).unit
+    override def create(teacher: Teacher): Task[Unit] =
+      dbContext.run {
+        teacherTable
+          .insert(lift(teacher))
+      }.unit.transact(xa)
 
-    override def get(id: UserId): Result[Option[Teacher]] =
-      dbContext.run(teacherTable
-        .filter(_.userId == lift(id))
-      ).map(_.headOption)
+    override def update(teacher: Teacher): Task[Unit] =
+      dbContext.run {
+        teacherTable
+          .filter(_.userId == lift(teacher.userId))
+          .update(lift(teacher))
+      }.unit.transact(xa)
 
-    override def getAll: Result[List[Teacher]] =
-      dbContext.run(teacherTable)
+    override def get(id: UserId): Task[Option[Teacher]] =
+      dbContext.run {
+        teacherTable
+          .filter(_.userId == lift(id))
+      }.map(_.headOption).transact(xa)
 
-    override def delete(id: UserId): Result[Unit] =
-      dbContext.run(teacherTable
-        .filter(_.userId == lift(id))
-        .delete
-      ).unit
+    override def getAll: Task[List[Teacher]] =
+      dbContext.run(teacherTable).transact(xa)
+
+    override def delete(id: UserId): Task[Unit] =
+      dbContext.run {
+        teacherTable
+          .filter(_.userId == lift(id))
+          .delete
+      }.unit.transact(xa)
   }
 }

@@ -7,7 +7,7 @@
 
     <changeSet id="create User table" author="ryazhapov">
         <createTable tableName="User">
-            <column name="id" type="uuid">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="email" type="varchar">
@@ -33,7 +33,7 @@
 
     <changeSet id="create Admin table" author="ryazhapov">
         <createTable tableName="Admin">
-            <column name="userId" type="uuid">
+            <column name="userId" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
         </createTable>
@@ -48,7 +48,7 @@
 
     <changeSet id="create Student table" author="ryazhapov">
         <createTable tableName="Student">
-            <column name="userId" type="uuid">
+            <column name="userId" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="level" type="varchar">
@@ -72,7 +72,7 @@
 
     <changeSet id="create Teacher table" author="ryazhapov">
         <createTable tableName="Teacher">
-            <column name="userId" type="uuid">
+            <column name="userId" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="level" type="varchar">
@@ -99,10 +99,10 @@
 
     <changeSet id="create Schedule table" author="ryazhapov">
         <createTable tableName="Schedule">
-            <column name="id" type="uuid">
+            <column name="id" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="teacherId" type="uuid">
+            <column name="teacherId" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="startsAt" type="timestamp with time zone">
@@ -123,13 +123,13 @@
 
     <changeSet id="create Lesson table" author="ryazhapov">
         <createTable tableName="Lesson">
-            <column name="id" type="uuid">
+            <column name="id" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="teacherId" type="uuid">
+            <column name="teacherId" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="studentId" type="uuid">
+            <column name="studentId" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="startsAt" type="timestamp with time zone">
@@ -170,10 +170,10 @@
 
     <changeSet id="create Replenishment table" author="ryazhapov">
         <createTable tableName="Replenishment">
-            <column name="id" type="uuid">
+            <column name="id" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="studentId" type="uuid">
+            <column name="studentId" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="amount" type="int">
@@ -191,10 +191,10 @@
 
     <changeSet id="create Withdrawal table" author="ryazhapov">
         <createTable tableName="Withdrawal">
-            <column name="id" type="uuid">
+            <column name="id" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="teacherId" type="uuid">
+            <column name="teacherId" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="amount" type="int">
@@ -212,16 +212,16 @@
 
     <changeSet id="create Payment table" author="ryazhapov">
         <createTable tableName="Payment">
-            <column name="id" type="uuid">
+            <column name="id" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="studentId" type="uuid">
+            <column name="studentId" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="teacherId" type="uuid">
+            <column name="teacherId" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="lessonId" type="uuid">
+            <column name="lessonId" type="int">
                 <constraints nullable="false"/>
             </column>
             <column name="amount" type="int">
@@ -253,10 +253,10 @@
 
     <changeSet id="create Session table" author="ryazhapov">
         <createTable tableName="Session">
-            <column name="id" type="uuid">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="userId" type="uuid">
+            <column name="userId" type="int">
                 <constraints nullable="false"/>
             </column>
         </createTable>

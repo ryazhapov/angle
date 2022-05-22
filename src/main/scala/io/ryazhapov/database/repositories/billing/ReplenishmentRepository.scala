@@ -1,42 +1,49 @@
 package io.ryazhapov.database.repositories.billing
 
+import doobie.implicits._
+import doobie.util.transactor.Transactor
 import io.ryazhapov.database.repositories.Repository
+import io.ryazhapov.database.repositories.lessons.ScheduleRepository.ScheduleRepository
+import io.ryazhapov.database.services.TransactorService.DBTransactor
 import io.ryazhapov.domain.UserId
 import io.ryazhapov.domain.billing.Replenishment
-import zio.{Has, ULayer, ZLayer}
+import zio.interop.catz._
+import zio.{Has, Task, URLayer, ZLayer}
 
 object ReplenishmentRepository extends Repository {
 
   import dbContext._
 
   type ReplenishmentRepository = Has[Service]
-  lazy val live: ULayer[ReplenishmentRepository] =
-    ZLayer.succeed(new ServiceImpl())
+
+  lazy val live: URLayer[DBTransactor, ReplenishmentRepository] =
+    ZLayer.fromService(new PostgresReplenishmentRepository(_))
 
   trait Service {
-    def create(replenishment: Replenishment): Result[Unit]
+    def create(replenishment: Replenishment): Task[Unit]
 
-    def getAll: Result[List[Replenishment]]
+    def getAll: Task[List[Replenishment]]
 
-    def getByStudent(studentId: UserId): Result[List[Replenishment]]
+    def getByStudent(studentId: UserId): Task[List[Replenishment]]
   }
 
-  class ServiceImpl() extends Service {
-    lazy val replenishmentTable = quote {
-      querySchema[Replenishment](""""Replenishment"""")
-    }
+  class PostgresReplenishmentRepository(xa: Transactor[Task]) extends Service {
 
-    override def create(replenishment: Replenishment): Result[Unit] =
-      dbContext.run(replenishmentTable
-        .insert(lift(replenishment))
-      ).unit
+    lazy val replenishmentTable = quote(querySchema[Replenishment](""""Replenishment""""))
 
-    override def getAll: Result[List[Replenishment]] =
-      dbContext.run(replenishmentTable)
+    override def create(replenishment: Replenishment): Task[Unit] =
+      dbContext.run {
+        replenishmentTable
+          .insert(lift(replenishment))
+      }.unit.transact(xa)
 
-    override def getByStudent(studentId: UserId): Result[List[Replenishment]] =
-      dbContext.run(replenishmentTable
-        .filter(_.studentId == lift(studentId))
-      )
+    override def getAll: Task[List[Replenishment]] =
+      dbContext.run(replenishmentTable).transact(xa)
+
+    override def getByStudent(studentId: UserId): Task[List[Replenishment]] =
+      dbContext.run {
+        replenishmentTable
+          .filter(_.studentId == lift(studentId))
+      }.transact(xa)
   }
 }

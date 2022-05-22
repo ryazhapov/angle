@@ -28,7 +28,7 @@ class ReplenishmentApi[R <: Api.DefaultApiEnv with ReplenishmentService with Stu
             _ <- log.info(s"Creating replenishment for ${user.id}")
             foundStudent <- StudentService.getStudent(user.id)
             request <- authReq.req.as[ReplenishmentRequest]
-            id <- zio.random.nextUUID
+            id = 0
             replenishment = Replenishment(
               id,
               user.id,

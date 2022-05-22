@@ -9,64 +9,51 @@ import io.ryazhapov.domain.accounts.Admin
 import io.ryazhapov.errors.AdminNotFound
 import zio.interop.catz._
 import zio.macros.accessible
-import zio.{Has, RIO, ZIO, ZLayer}
+import zio.{Has, RIO, Task, ZIO, ZLayer}
 
 @accessible
 object AdminService {
 
   type AdminService = Has[Service]
 
+  lazy val live = ZLayer.fromService[
+    AdminRepository.Service,
+    AdminService.Service
+  ](repo => new ServiceImpl(repo))
+
   trait Service {
-    def createAdmin(admin: Admin): RIO[DBTransactor, Unit]
+    def createAdmin(admin: Admin): Task[Unit]
 
-    def updateAdmin(admin: Admin): RIO[DBTransactor, Unit]
+    def updateAdmin(admin: Admin): Task[Unit]
 
-    def getAdmin(id: UserId): RIO[DBTransactor, Admin]
+    def getAdmin(id: UserId): Task[Admin]
 
-    def getAllAdmins: RIO[DBTransactor, List[Admin]]
+    def getAllAdmins: Task[List[Admin]]
 
-    def deleteAdmin(id: UserId): RIO[DBTransactor, Unit]
+    def deleteAdmin(id: UserId): Task[Unit]
   }
 
   class ServiceImpl(
     adminRepository: AdminRepository.Service
   ) extends Service {
 
-    import doobie.implicits._
+    override def createAdmin(admin: Admin): Task[Unit] =
+      adminRepository.create(admin)
 
-    override def createAdmin(admin: Admin): RIO[DBTransactor, Unit] =
-      for {
-        transactor <- TransactorService.databaseTransactor
-        _ <- adminRepository.create(admin).transact(transactor).unit
-      } yield ()
+    override def updateAdmin(admin: Admin): Task[Unit] =
+      adminRepository.update(admin)
 
-    override def updateAdmin(admin: Admin): RIO[DBTransactor, Unit] =
+    override def getAdmin(id: UserId): Task[Admin] =
       for {
-        transactor <- TransactorService.databaseTransactor
-        _ <- adminRepository.update(admin).transact(transactor).unit
-      } yield ()
-
-    override def getAdmin(id: UserId): RIO[DBTransactor, Admin] =
-      for {
-        transactor <- TransactorService.databaseTransactor
-        adminOpt <- adminRepository.get(id).transact(transactor)
+        adminOpt <- adminRepository.get(id)
         admin <- ZIO.fromEither(adminOpt.toRight(AdminNotFound))
       } yield admin
 
-    override def getAllAdmins: RIO[DBTransactor, List[Admin]] =
-      for {
-        transactor <- TransactorService.databaseTransactor
-        admins <- adminRepository.getAll.transact(transactor)
-      } yield admins
+    override def getAllAdmins: Task[List[Admin]] =
+      adminRepository.getAll
 
     //TODO
-    override def deleteAdmin(id: UserId): RIO[DBTransactor, Unit] =
-      for {
-        transactor <- TransactorService.databaseTransactor
-        _ <- adminRepository.delete(id).transact(transactor)
-      } yield ()
+    override def deleteAdmin(id: UserId): Task[Unit] =
+      adminRepository.delete(id)
   }
-
-  lazy val live: ZLayer[AdminRepository, Nothing, AdminService] =
-    ZLayer.fromService[AdminRepository.Service, AdminService.Service](repo => new ServiceImpl(repo))
 }

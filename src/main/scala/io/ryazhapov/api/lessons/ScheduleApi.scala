@@ -29,7 +29,7 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
           val handleRequest = for {
             _ <- log.info(s"Creating schedule for ${user.id}")
             request <- authReq.req.as[ScheduleRequest]
-            id <- zio.random.nextUUID
+            id = 0
             schedule = Schedule(
               id,
               user.id,
@@ -72,7 +72,7 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
         case _ => IO(Response(Unauthorized))
       }
 
-    case GET -> Root / UUIDVar(id) as UserWithSession(_, session) =>
+    case GET -> Root / IntVar(id) as UserWithSession(_, session) =>
       val handleRequest = for {
         _ <- log.info(s"Getting schedule $id")
         result <- ScheduleService.getSchedule(id)
@@ -102,7 +102,7 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
         result => okWithCookie(result, session.id)
       )
 
-    case DELETE -> Root / UUIDVar(id) as UserWithSession(user, session) =>
+    case DELETE -> Root / IntVar(id) as UserWithSession(user, session) =>
       user.role match {
 
         case TeacherRole if user.verified =>

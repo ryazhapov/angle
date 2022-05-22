@@ -32,7 +32,7 @@ class PaymentApi[R <: Api.DefaultApiEnv with PaymentService with LessonService w
             foundTeacher <- TeacherService.getTeacher(user.id)
             foundStudent <- StudentService.getStudent(foundLesson.studentId)
             _ <- ZIO.when(user.id == foundLesson.teacherId)(ZIO.fail(UnauthorizedAction))
-            id <- zio.random.nextUUID
+            id = 0
             payment = Payment(
               id,
               foundLesson.studentId,
@@ -53,7 +53,7 @@ class PaymentApi[R <: Api.DefaultApiEnv with PaymentService with LessonService w
         case _ => IO(Response(Unauthorized))
       }
 
-    case GET -> Root / UUIDVar(id) as UserWithSession(_, session) =>
+    case GET -> Root / IntVar(id) as UserWithSession(_, session) =>
       val handleRequest = for {
         _ <- log.info(s"Getting payment $id")
         result <- PaymentService.getPayment(id)

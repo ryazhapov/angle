@@ -1,9 +1,13 @@
 package io.ryazhapov.database.repositories.lessons
 
+import doobie.implicits._
+import doobie.util.transactor.Transactor
 import io.ryazhapov.database.repositories.Repository
+import io.ryazhapov.database.services.TransactorService.DBTransactor
 import io.ryazhapov.domain.lessons.Schedule
 import io.ryazhapov.domain.{ScheduleId, UserId}
-import zio.{Has, ULayer, ZLayer}
+import zio.interop.catz._
+import zio.{Has, Task, URLayer, ZLayer}
 
 import java.time.ZonedDateTime
 
@@ -12,74 +16,81 @@ object ScheduleRepository extends Repository {
   import dbContext._
 
   type ScheduleRepository = Has[Service]
-  lazy val live: ULayer[ScheduleRepository] =
-    ZLayer.succeed(new ServiceImpl())
+
+  lazy val live: URLayer[DBTransactor, ScheduleRepository] =
+    ZLayer.fromService(new PostgresScheduleRepository(_))
 
   trait Service {
-    def create(schedule: Schedule): Result[Unit]
+    def create(schedule: Schedule): Task[Unit]
 
-    def update(schedule: Schedule): Result[Unit]
+    def update(schedule: Schedule): Task[Unit]
 
-    def get(id: ScheduleId): Result[Option[Schedule]]
+    def get(id: ScheduleId): Task[Option[Schedule]]
 
-    def getAll: Result[List[Schedule]]
+    def getAll: Task[List[Schedule]]
 
-    def getByTeacher(teacherId: UserId): Result[List[Schedule]]
+    def getByTeacher(teacherId: UserId): Task[List[Schedule]]
 
-    def findIntersection(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): Result[List[Schedule]]
+    def findIntersection(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): Task[List[Schedule]]
 
-    def findUnion(schedule: Schedule): Result[List[Schedule]]
+    def findUnion(schedule: Schedule): Task[List[Schedule]]
 
-    def delete(id: ScheduleId): Result[Unit]
+    def delete(id: ScheduleId): Task[Unit]
   }
 
-  class ServiceImpl() extends Service {
-    lazy val scheduleTable = quote {
-      querySchema[Schedule](""""Schedule"""")
-    }
+  class PostgresScheduleRepository(xa: Transactor[Task]) extends Service {
 
-    override def create(schedule: Schedule): Result[Unit] =
-      dbContext.run(scheduleTable
-        .insert(lift(schedule))
-      ).unit
+    lazy val scheduleTable = quote(querySchema[Schedule](""""Schedule""""))
 
-    override def update(schedule: Schedule): Result[Unit] =
-      dbContext.run(scheduleTable
-        .filter(_.id == lift(schedule.id))
-        .update(lift(schedule))
-      ).unit
+    override def create(schedule: Schedule): Task[Unit] =
+      dbContext.run {
+        scheduleTable
+          .insert(lift(schedule))
+      }.unit.transact(xa)
 
-    override def get(id: ScheduleId): Result[Option[Schedule]] =
-      dbContext.run(scheduleTable
-        .filter(_.id == lift(id))
-      ).map(_.headOption)
+    override def update(schedule: Schedule): Task[Unit] =
+      dbContext.run {
+        scheduleTable
+          .filter(_.id == lift(schedule.id))
+          .update(lift(schedule))
+      }.unit.transact(xa)
 
-    override def getAll: Result[List[Schedule]] =
-      dbContext.run(scheduleTable)
+    override def get(id: ScheduleId): Task[Option[Schedule]] =
+      dbContext.run {
+        scheduleTable
+          .filter(_.id == lift(id))
+      }.map(_.headOption).transact(xa)
 
-    override def getByTeacher(teacherId: UserId): Result[List[Schedule]] =
-      dbContext.run(scheduleTable
-        .filter(_.teacherId == lift(teacherId))
-      )
+    override def getAll: Task[List[Schedule]] =
+      dbContext.run(scheduleTable).transact(xa)
 
-    override def findIntersection(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): Result[List[Schedule]] =
-      dbContext.run(scheduleTable
-        .filter(x => x.startsAt <= lift(lessonStart) && x.endsAt >= lift(lessonEnd))
-      )
+    override def getByTeacher(teacherId: UserId): Task[List[Schedule]] =
+      dbContext.run {
+        scheduleTable
+          .filter(_.teacherId == lift(teacherId))
+      }.transact(xa)
 
-    override def findUnion(schedule: Schedule): Result[List[Schedule]] =
-      dbContext.run(scheduleTable
-        .filter(_.teacherId == lift(schedule.teacherId))
-        .filter(x =>
-          !(x.startsAt > lift(schedule.startsAt) && x.startsAt >= lift(schedule.endsAt)) &&
-            !(x.endsAt <= lift(schedule.startsAt) && x.endsAt < lift(schedule.endsAt))
-        )
-      )
+    override def findIntersection(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): Task[List[Schedule]] =
+      dbContext.run {
+        scheduleTable
+          .filter(x => x.startsAt <= lift(lessonStart) && x.endsAt >= lift(lessonEnd))
+      }.transact(xa)
 
-    override def delete(id: ScheduleId): Result[Unit] =
-      dbContext.run(scheduleTable
-        .filter(_.id == lift(id))
-        .delete
-      ).unit
+    override def findUnion(schedule: Schedule): Task[List[Schedule]] =
+      dbContext.run {
+        scheduleTable
+          .filter(_.teacherId == lift(schedule.teacherId))
+          .filter(x =>
+            !(x.startsAt > lift(schedule.startsAt) && x.startsAt >= lift(schedule.endsAt)) &&
+              !(x.endsAt <= lift(schedule.startsAt) && x.endsAt < lift(schedule.endsAt))
+          )
+      }.transact(xa)
+
+    override def delete(id: ScheduleId): Task[Unit] =
+      dbContext.run {
+        scheduleTable
+          .filter(_.id == lift(id))
+          .delete
+      }.unit.transact(xa)
   }
 }

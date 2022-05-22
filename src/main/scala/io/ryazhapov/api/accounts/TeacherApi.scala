@@ -18,7 +18,7 @@ class TeacherApi[R <: Api.DefaultApiEnv with TeacherService] extends Api[R] {
 
   val teacherRoutes: AuthedRoutes[UserWithSession, ApiTask] = AuthedRoutes.of[UserWithSession, ApiTask] {
 
-    case authReq @ PUT -> Root / "update" / UUIDVar(id) as UserWithSession(user, session) =>
+    case authReq @ PUT -> Root / "update" / IntVar(id) as UserWithSession(user, session) =>
       user.role match {
         case TeacherRole if id == user.id && user.verified =>
           val handleRequest = for {
@@ -36,7 +36,7 @@ class TeacherApi[R <: Api.DefaultApiEnv with TeacherService] extends Api[R] {
         case _ => IO(Response(Unauthorized))
       }
 
-    case GET -> Root / UUIDVar(id) as UserWithSession(_, session) =>
+    case GET -> Root / IntVar(id) as UserWithSession(_, session) =>
       val handleRequest = for {
         _ <- log.info(s"Getting teacher $id")
         result <- TeacherService.getTeacher(id)

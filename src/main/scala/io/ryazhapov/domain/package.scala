@@ -1,16 +1,14 @@
 package io.ryazhapov
 
-import java.util.UUID
-
 package object domain {
-  type UserId = UUID
-  type SessionId = UUID
+  type UserId = Int
+  type SessionId = Int
   type Password = String
 
-  type ScheduleId = UUID
-  type LessonId = UUID
+  type ScheduleId = Int
+  type LessonId = Int
 
-  type ReplenishmentId = UUID
-  type PaymentId = UUID
-  type WithdrawalId = UUID
+  type ReplenishmentId = Int
+  type PaymentId = Int
+  type WithdrawalId = Int
 }

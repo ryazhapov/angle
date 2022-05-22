@@ -1,115 +1,90 @@
 package io.ryazhapov.services.lessons
 
 import io.ryazhapov.database.repositories.lessons.LessonRepository
-import io.ryazhapov.database.repositories.lessons.LessonRepository.LessonRepository
-import io.ryazhapov.database.services.TransactorService
-import io.ryazhapov.database.services.TransactorService.DBTransactor
 import io.ryazhapov.domain.LessonId
 import io.ryazhapov.domain.auth.User
 import io.ryazhapov.domain.lessons.Lesson
 import io.ryazhapov.errors.{InvalidLessonTime, InvalidScheduleTime, LessonNotFound}
-import zio.interop.catz._
 import zio.macros.accessible
-import zio.{Has, RIO, ZIO, ZLayer}
+import zio.{Has, Task, ZIO, ZLayer}
 
 @accessible
 object LessonService {
 
   type LessonService = Has[Service]
-  lazy val live: ZLayer[LessonRepository, Nothing, LessonService] =
-    ZLayer.fromService[LessonRepository.Service, LessonService.Service](repo => new ServiceImpl(repo))
 
-  def isValidLesson(lesson: Lesson): Boolean =
-    lesson.startsAt.isBefore(lesson.endsAt) && !lesson.startsAt.isEqual(lesson.endsAt)
+  lazy val live = ZLayer.fromService[
+    LessonRepository.Service,
+    LessonService.Service
+  ](repo => new ServiceImpl(repo))
 
   trait Service {
-    def createLesson(lesson: Lesson): RIO[DBTransactor, Unit]
+    def createLesson(lesson: Lesson): Task[Unit]
 
-    def completeLesson(id: LessonId): RIO[DBTransactor, Unit]
+    def completeLesson(id: LessonId): Task[Unit]
 
-    def getLesson(id: LessonId): RIO[DBTransactor, Lesson]
+    def getLesson(id: LessonId): Task[Lesson]
 
-    def getAllLessons: RIO[DBTransactor, List[Lesson]]
+    def getAllLessons: Task[List[Lesson]]
 
-    def getAllLessonWithFilter(completed: Boolean): RIO[DBTransactor, List[Lesson]]
+    def getAllLessonWithFilter(completed: Boolean): Task[List[Lesson]]
 
-    def getLessonsByUser(user: User): RIO[DBTransactor, List[Lesson]]
+    def getLessonsByUser(user: User): Task[List[Lesson]]
 
-    def getLessonsByUserWithFilter(user: User, completed: Boolean): RIO[DBTransactor, List[Lesson]]
+    def getLessonsByUserWithFilter(user: User, completed: Boolean): Task[List[Lesson]]
 
-    def isOverlapping(lesson: Lesson): RIO[DBTransactor, Boolean]
+    def isOverlapping(lesson: Lesson): Task[Boolean]
 
-    def deleteLesson(id: LessonId): RIO[DBTransactor, Unit]
+    def deleteLesson(id: LessonId): Task[Unit]
   }
 
   class ServiceImpl(
     lessonRepository: LessonRepository.Service
   ) extends Service {
 
-    import doobie.implicits._
-
-    override def createLesson(lesson: Lesson): RIO[DBTransactor, Unit] =
+    override def createLesson(lesson: Lesson): Task[Unit] =
       for {
-        transactor <- TransactorService.databaseTransactor
-        _ <- ZIO.cond(isValidLesson(lesson), (), InvalidLessonTime)
-        _ <- lessonRepository.create(lesson).transact(transactor).unit
+        _ <- ZIO.cond(lesson.valid, (), InvalidLessonTime)
+        _ <- lessonRepository.create(lesson).unit
       } yield ()
 
-    override def completeLesson(id: LessonId): RIO[DBTransactor, Unit] =
+    override def completeLesson(id: LessonId): Task[Unit] =
       for {
-        transactor <- TransactorService.databaseTransactor
-        lessonOpt <- lessonRepository.get(id).transact(transactor)
+        lessonOpt <- lessonRepository.get(id)
         lesson <- ZIO.fromEither(lessonOpt.toRight(LessonNotFound))
         completed = lesson.copy(completed = true)
-        _ <- lessonRepository.update(completed).transact(transactor).unit
+        _ <- lessonRepository.update(completed).unit
       } yield ()
 
-    override def getLesson(id: LessonId): RIO[DBTransactor, Lesson] =
+    override def getLesson(id: LessonId): Task[Lesson] =
       for {
-        transactor <- TransactorService.databaseTransactor
-        lessonOpt <- lessonRepository.get(id).transact(transactor)
+        lessonOpt <- lessonRepository.get(id)
         lesson <- ZIO.fromEither(lessonOpt.toRight(LessonNotFound))
       } yield lesson
 
-    override def getAllLessons: RIO[DBTransactor, List[Lesson]] =
-      for {
-        transactor <- TransactorService.databaseTransactor
-        lessons <- lessonRepository.getAll.transact(transactor)
-      } yield lessons
+    override def getAllLessons: Task[List[Lesson]] =
+      lessonRepository.getAll
 
-    override def getAllLessonWithFilter(completed: Boolean): RIO[DBTransactor, List[Lesson]] =
-      for {
-        transactor <- TransactorService.databaseTransactor
-        lessons <- lessonRepository.getFiltered(completed).transact(transactor)
-      } yield lessons
+    override def getAllLessonWithFilter(completed: Boolean): Task[List[Lesson]] =
+      lessonRepository.getFiltered(completed)
 
-    override def getLessonsByUser(user: User): RIO[DBTransactor, List[Lesson]] =
-      for {
-        transactor <- TransactorService.databaseTransactor
-        lessons <- lessonRepository.getByUser(user).transact(transactor)
-      } yield lessons
+    override def getLessonsByUser(user: User): Task[List[Lesson]] =
+      lessonRepository.getByUser(user)
 
-    override def getLessonsByUserWithFilter(user: User, completed: Boolean): RIO[DBTransactor, List[Lesson]] =
-      for {
-        transactor <- TransactorService.databaseTransactor
-        lessons <- lessonRepository.getByUserFiltered(user, completed).transact(transactor)
-      } yield lessons
+    override def getLessonsByUserWithFilter(user: User, completed: Boolean): Task[List[Lesson]] =
+      lessonRepository.getByUserFiltered(user, completed)
 
-    override def isOverlapping(lesson: Lesson): RIO[DBTransactor, Boolean] =
+    override def isOverlapping(lesson: Lesson): Task[Boolean] =
       for {
-        _ <- ZIO.cond(isValidLesson(lesson), (), InvalidScheduleTime)
-        transactor <- TransactorService.databaseTransactor
-        schedules <- lessonRepository.findUnion(lesson).transact(transactor)
+        _ <- ZIO.cond(lesson.valid, (), InvalidScheduleTime)
+        schedules <- lessonRepository.findUnion(lesson)
         result = schedules match {
           case ::(_, _) => true
           case Nil      => false
         }
       } yield result
 
-    override def deleteLesson(id: LessonId): RIO[DBTransactor, Unit] =
-      for {
-        transactor <- TransactorService.databaseTransactor
-        _ <- lessonRepository.delete(id).transact(transactor)
-      } yield ()
+    override def deleteLesson(id: LessonId): Task[Unit] =
+      lessonRepository.delete(id)
   }
 }

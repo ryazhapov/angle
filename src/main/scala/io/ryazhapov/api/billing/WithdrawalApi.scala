@@ -29,7 +29,7 @@ class WithdrawalApi[R <: Api.DefaultApiEnv with WithdrawalService with TeacherSe
             foundTeacher <- TeacherService.getTeacher(user.id)
             request <- authReq.req.as[WithdrawalRequest]
             _ <- ZIO.when(foundTeacher.balance >= request.amount)(ZIO.fail(NotEnoughMoney))
-            id <- zio.random.nextUUID
+            id = 0
             withdrawal = Withdrawal(
               id,
               user.id,

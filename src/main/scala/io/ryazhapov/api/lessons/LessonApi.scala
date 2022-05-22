@@ -38,7 +38,7 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
             foundTeacher <- TeacherService.getTeacher(request.teacherId)
             _ <- log.info(s"Creating lesson for Student:${user.id} and Teacher:${foundTeacher.userId}")
             _ <- ZIO.when(foundStudent.balance >= foundTeacher.rate)(ZIO.fail(NotEnoughMoney))
-            id <- zio.random.nextUUID
+            id = 0
             lesson = Lesson(
               id,
               foundTeacher.userId,
@@ -66,7 +66,7 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
         case _ => IO(Response(Unauthorized))
       }
 
-    case GET -> Root / UUIDVar(id) as UserWithSession(_, session) =>
+    case GET -> Root / IntVar(id) as UserWithSession(_, session) =>
       val handleRequest = for {
         _ <- log.info(s"Getting lesson $id")
         result <- LessonService.getLesson(id)
@@ -142,7 +142,7 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
           )
       }
 
-    case DELETE -> Root / UUIDVar(id) as UserWithSession(user, session) =>
+    case DELETE -> Root / IntVar(id) as UserWithSession(user, session) =>
       user.role match {
         case AdminRole => IO(Response(MethodNotAllowed))
 

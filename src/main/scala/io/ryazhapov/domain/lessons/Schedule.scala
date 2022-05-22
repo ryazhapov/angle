@@ -9,4 +9,7 @@ case class Schedule(
   teacherId: UserId,
   startsAt: ZonedDateTime,
   endsAt: ZonedDateTime
-)
+) {
+  def valid: Boolean =
+    startsAt.isBefore(endsAt) && !startsAt.isEqual(endsAt)
+}
