@@ -20,7 +20,7 @@ object Server extends Environment {
 
   type AppTask[A] = RIO[AppEnvironment, A]
 
-  val httpApp: Kleisli[AppTask, Request[AppTask], Response[AppTask]] = Router[AppTask](
+  val httpApp = Router[AppTask](
     "/api/auth" -> new AuthApi().routes,
     "/api/teacher" -> new TeacherApi().routes,
     "/api/admin" -> new AdminApi().routes,
@@ -31,7 +31,7 @@ object Server extends Environment {
     "/api/withdrawal" -> new WithdrawalApi().routes
   ).orNotFound
 
-  val server: ZIO[AppEnvironment, Throwable, Unit] = for {
+  val server = for {
     config <- zio.config.getConfig[Config]
     _ <- performMigration
     _ <- ZIO.runtime[AppEnvironment].flatMap { implicit runtime =>
@@ -45,8 +45,8 @@ object Server extends Environment {
     }
   } yield ()
 
-  def start(): URIO[ZEnv with Console, ExitCode] =
+  def start() =
     server
-      .provideSomeLayer[ZEnv](appEnvironment)
+      .provideCustomLayer(appEnvironment)
       .exitCode
 }

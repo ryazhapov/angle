@@ -28,7 +28,7 @@ object PaymentRepository extends Repository {
   }
 
   class ServiceImpl() extends Service {
-    lazy val paymentTable: Quoted[EntityQuery[Payment]] = quote {
+    lazy val paymentTable = quote {
       querySchema[Payment](""""Payment"""")
     }
 

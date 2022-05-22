@@ -34,7 +34,7 @@ object ScheduleRepository extends Repository {
   }
 
   class ServiceImpl() extends Service {
-    lazy val scheduleTable: Quoted[EntityQuery[Schedule]] = quote {
+    lazy val scheduleTable = quote {
       querySchema[Schedule](""""Schedule"""")
     }
 

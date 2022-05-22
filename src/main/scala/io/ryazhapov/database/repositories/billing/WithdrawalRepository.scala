@@ -22,7 +22,7 @@ object WithdrawalRepository extends Repository {
   }
 
   class ServiceImpl() extends Service {
-    lazy val withdrawalTable: Quoted[EntityQuery[Withdrawal]] = quote {
+    lazy val withdrawalTable = quote {
       querySchema[Withdrawal](""""Withdrawal"""")
     }
 

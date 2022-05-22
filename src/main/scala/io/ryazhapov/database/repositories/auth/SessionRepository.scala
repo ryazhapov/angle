@@ -23,7 +23,7 @@ object SessionRepository extends Repository {
   }
 
   class ServiceImpl() extends Service {
-    lazy val sessionTable: Quoted[EntityQuery[auth.Session]] = quote {
+    lazy val sessionTable = quote {
       querySchema[auth.Session](""""Session"""")
     }
 

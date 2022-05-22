@@ -15,6 +15,8 @@ lazy val root = (project in file("."))
       Dependencies.liquibase,
       Dependencies.postgres,
       Dependencies.logback,
+    ),
+    testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework")),
+    addCompilerPlugin(
+      "org.typelevel" % "kind-projector" % "0.11.3" cross CrossVersion.full
     ))
-
-testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework"))

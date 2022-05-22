@@ -12,8 +12,6 @@ object UserRepository extends Repository {
 
   type UserRepository = Has[Service]
 
-  private implicit val encodeRole: MappedEncoding[Role, String] = MappedEncoding[Role, String](_.toString)
-  private implicit val decodeRole: MappedEncoding[String, Role] = MappedEncoding[String, Role](Role.fromString)
   lazy val live: ULayer[UserRepository.UserRepository] =
     ZLayer.succeed(new ServiceImpl())
 
@@ -38,7 +36,7 @@ object UserRepository extends Repository {
   }
 
   class ServiceImpl() extends Service {
-    lazy val userTable: Quoted[EntityQuery[User]] = quote {
+    lazy val userTable = quote {
       querySchema[User](""""User"""")
     }
 

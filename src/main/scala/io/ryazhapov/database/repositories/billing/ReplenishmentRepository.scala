@@ -22,7 +22,7 @@ object ReplenishmentRepository extends Repository {
   }
 
   class ServiceImpl() extends Service {
-    lazy val replenishmentTable: Quoted[EntityQuery[Replenishment]] = quote {
+    lazy val replenishmentTable = quote {
       querySchema[Replenishment](""""Replenishment"""")
     }
 

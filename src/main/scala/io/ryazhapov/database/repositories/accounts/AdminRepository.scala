@@ -11,8 +11,7 @@ object AdminRepository extends Repository {
 
   type AdminRepository = Has[Service]
 
-  private implicit val encodeLevel: MappedEncoding[Level, String] = MappedEncoding[Level, String](_.toString)
-  private implicit val decodeLevel: MappedEncoding[String, Level] = MappedEncoding[String, Level](Level.fromString)
+
 
   trait Service {
     def create(admin: Admin): Result[Unit]
@@ -27,7 +26,7 @@ object AdminRepository extends Repository {
   }
 
   class ServiceImpl() extends Service {
-    lazy val adminTable: Quoted[EntityQuery[Admin]] = quote {
+    lazy val adminTable = quote {
       querySchema[Admin](""""Admin"""")
     }
 

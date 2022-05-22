@@ -34,7 +34,7 @@ object LessonRepository extends Repository {
   }
 
   class ServiceImpl() extends Service {
-    lazy val lessonTable: Quoted[EntityQuery[Lesson]] = quote {
+    lazy val lessonTable = quote {
       querySchema[Lesson](""""Lesson"""")
     }
 

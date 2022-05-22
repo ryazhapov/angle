@@ -40,6 +40,7 @@ trait Api[R <: DefaultApiEnv] extends ErrorMapping[R] {
   val dsl: Http4sDsl[ApiTask] = Http4sDsl[ApiTask]
 
   import dsl._
+
   private val authUser: Kleisli[ApiTask, Request[ApiTask], Either[String, UserWithSession]] = Kleisli { request =>
     getUser(request).foldM(
       error => ZIO.left(error.getMessage),
@@ -49,8 +50,7 @@ trait Api[R <: DefaultApiEnv] extends ErrorMapping[R] {
   private val onFailure: AuthedRoutes[String, ApiTask] = Kleisli(req => OptionT.liftF(Forbidden(req.context)))
   val authMiddleware: AuthMiddleware[ApiTask, UserWithSession] = AuthMiddleware(authUser, onFailure)
 
-  def okWithCookie[A](result: A, sessionId: SessionId)
-    (implicit encoder: EntityEncoder[ApiTask, A]): ZIO[R, Throwable, Response[Api.this.ApiTask]#Self] =
+  def okWithCookie[A: EntityEncoder[ApiTask, *]](result: A, sessionId: SessionId): ApiTask[Response[ApiTask]] =
     for {
       config <- zio.config.getConfig[Config]
       result <- Ok(result).map(_.addCookie(ResponseCookie(
