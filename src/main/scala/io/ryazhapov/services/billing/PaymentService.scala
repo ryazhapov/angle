@@ -24,7 +24,7 @@ object PaymentService {
     new ServiceImpl(studentRepo, teacherRepo, lessonRepo, paymentRepo))
 
   trait Service {
-    def createPayment(id: UserId, lessonId: LessonId): Task[Unit]
+    def createPayment(id: UserId, lessonId: LessonId): Task[PaymentId]
 
     def getPayment(id: PaymentId): Task[Payment]
 
@@ -44,7 +44,7 @@ object PaymentService {
     paymentRepository: PaymentRepository.Service
   ) extends Service {
 
-    override def createPayment(id: UserId, lessonId: LessonId): Task[Unit] = {
+    override def createPayment(id: UserId, lessonId: LessonId): Task[PaymentId] =
       for {
         lessonOpt <- lessonRepository.get(lessonId)
         lesson <- ZIO.fromEither(lessonOpt.toRight(LessonNotFound))
@@ -61,7 +61,6 @@ object PaymentService {
         _ <- lessonRepository.update(updLesson)
         paymentId <- paymentRepository.create(Payment(0, student.userId, id, lessonId, teacher.rate))
       } yield paymentId
-    }
 
     override def getPayment(id: PaymentId): Task[Payment] =
       for {

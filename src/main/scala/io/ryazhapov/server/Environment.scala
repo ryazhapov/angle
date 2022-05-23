@@ -6,6 +6,7 @@ import io.ryazhapov.database.repositories.accounts.AdminRepository.AdminReposito
 import io.ryazhapov.database.repositories.accounts.StudentRepository.StudentRepository
 import io.ryazhapov.database.repositories.accounts.TeacherRepository.TeacherRepository
 import io.ryazhapov.database.repositories.accounts.{AdminRepository, StudentRepository, TeacherRepository}
+import io.ryazhapov.database.repositories.auth.SessionRepository.SessionRepository
 import io.ryazhapov.database.repositories.auth.UserRepository.UserRepository
 import io.ryazhapov.database.repositories.auth.{SessionRepository, UserRepository}
 import io.ryazhapov.database.repositories.billing.PaymentRepository.PaymentRepository
@@ -33,38 +34,62 @@ import io.ryazhapov.services.billing.{PaymentService, ReplenishmentService, With
 import io.ryazhapov.services.lessons.LessonService.LessonService
 import io.ryazhapov.services.lessons.ScheduleService.ScheduleService
 import io.ryazhapov.services.lessons.{LessonService, ScheduleService}
-import zio.blocking.Blocking
-import zio.clock.Clock
-import zio.console.Console
-import zio.random.Random
+import zio.magic._
+import zio.{ZEnv, ZLayer}
 
 trait Environment {
 
-  type AppEnvironment = Configuration with Clock with Blocking with Random with Console with
-    Liqui with MigrationService with DBTransactor with LoggerService with
-    UserService with UserRepository with
-    TeacherRepository with TeacherService with
-    AdminRepository with AdminService with
-    LessonRepository with LessonService with
-    StudentRepository with StudentService with
-    ReplenishmentRepository with ReplenishmentService with
-    WithdrawalRepository with WithdrawalService with
-    PaymentRepository with PaymentService with
-    ScheduleRepository with ScheduleService
+  type AppEnvironment = ZEnv with Services
 
+  type Services = AdminRepository with
+    AdminService with
+    Configuration with
+    DBTransactor with
+    LessonRepository with
+    LessonService with
+    Liqui with
+    LoggerService with
+    MigrationService with
+    PaymentRepository with
+    PaymentService with
+    ReplenishmentRepository with
+    ReplenishmentService with
+    ScheduleRepository with
+    ScheduleService with
+    SessionRepository with
+    StudentRepository with
+    StudentService with
+    TeacherRepository with
+    TeacherService with
+    UserRepository with
+    UserService with
+    WithdrawalRepository with
+    WithdrawalService
 
-  val appEnvironment =
-    LoggerService.live >+> ConfigService.live >+> Blocking.live >+> Clock.live >+>
-      TransactorService.live >+>
-      SessionRepository.live >+>
-      MigrationService.liquibaseLayer >+> MigrationService.live >+>
-      TeacherRepository.live >+> TeacherService.live >+>
-      AdminRepository.live >+> AdminService.live >+>
-      StudentRepository.live >+> StudentService.live >+>
-      UserRepository.live >+> UserService.live >+>
-      ReplenishmentRepository.live >+> ReplenishmentService.live >+>
-      ScheduleRepository.live >+> ScheduleService.live >+>
-      LessonRepository.live >+> LessonService.live >+>
-      PaymentRepository.live >+> PaymentService.live >+>
-      WithdrawalRepository.live >+> WithdrawalService.live
+  val appEnvironment = ZLayer.wireSome[ZEnv, Services](
+    AdminRepository.live,
+    AdminService.live,
+    ConfigService.live,
+    LessonRepository.live,
+    LessonService.live,
+    LoggerService.live,
+    MigrationService.liquibaseLayer,
+    MigrationService.live,
+    PaymentRepository.live,
+    PaymentService.live,
+    ReplenishmentRepository.live,
+    ReplenishmentService.live,
+    ScheduleRepository.live,
+    ScheduleService.live,
+    SessionRepository.live,
+    StudentRepository.live,
+    StudentService.live,
+    TeacherRepository.live,
+    TeacherService.live,
+    TransactorService.live,
+    UserRepository.live,
+    UserService.live,
+    WithdrawalRepository.live,
+    WithdrawalService.live
+  )
 }

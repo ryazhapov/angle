@@ -55,9 +55,10 @@ object Dependencies {
     "org.http4s" %% "http4s-blaze-client" % Http4sVersion
   )
 
-  lazy val security: Seq[ModuleID] = Seq(
+  lazy val utils: Seq[ModuleID] = Seq(
     "commons-codec" % "commons-codec" % CommonsCodecVersion,
     "org.testcontainers" % "postgresql" % "1.16.2" % Test,
+    "io.github.kitlangton" %% "zio-magic" % "0.3.6",
     "com.beachape" %% "enumeratum-circe" % "1.6.1"
   )
 }
