@@ -10,6 +10,6 @@ case class Schedule(
   startsAt: ZonedDateTime,
   endsAt: ZonedDateTime
 ) {
-  def valid: Boolean =
+  def isValid: Boolean =
     startsAt.isBefore(endsAt) && !startsAt.isEqual(endsAt)
 }

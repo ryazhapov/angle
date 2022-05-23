@@ -3,10 +3,10 @@ package io.ryazhapov.services.billing
 import io.ryazhapov.database.repositories.accounts.TeacherRepository
 import io.ryazhapov.database.repositories.billing.WithdrawalRepository
 import io.ryazhapov.domain.UserId
-import io.ryazhapov.domain.accounts.Teacher
-import io.ryazhapov.domain.billing.Withdrawal
+import io.ryazhapov.domain.billing.{Withdrawal, WithdrawalRequest}
+import io.ryazhapov.errors.{NotEnoughMoney, TeacherNotFound}
 import zio.macros.accessible
-import zio.{Has, Task, ZLayer}
+import zio.{Has, Task, ZIO, ZLayer}
 
 @accessible
 object WithdrawalService {
@@ -20,7 +20,7 @@ object WithdrawalService {
   ]((teacherRepo, withdrawalRepo) => new ServiceImpl(teacherRepo, withdrawalRepo))
 
   trait Service {
-    def createWithdrawal(teacher: Teacher, withdrawal: Withdrawal): Task[Unit]
+    def createWithdrawal(id: UserId, request: WithdrawalRequest): Task[Unit]
 
     def getAllWithdrawals: Task[List[Withdrawal]]
 
@@ -32,10 +32,14 @@ object WithdrawalService {
     withdrawalRepository: WithdrawalRepository.Service
   ) extends Service {
 
-    override def createWithdrawal(teacher: Teacher, withdrawal: Withdrawal): Task[Unit] =
+    override def createWithdrawal(id: UserId, request: WithdrawalRequest): Task[Unit] =
       for {
-        _ <- teacherRepository.update(teacher)
-        _ <- withdrawalRepository.create(withdrawal)
+        teacherOpt <- teacherRepository.get(id)
+        teacher <- ZIO.fromEither(teacherOpt.toRight(TeacherNotFound))
+        _ <- ZIO.when(teacher.balance >= request.amount)(ZIO.fail(NotEnoughMoney))
+        updTeacher = teacher.copy(balance = teacher.balance - request.amount)
+        _ <- teacherRepository.update(updTeacher)
+        _ <- withdrawalRepository.create(Withdrawal(0, id, request.amount))
       } yield ()
 
     override def getAllWithdrawals: Task[List[Withdrawal]] =

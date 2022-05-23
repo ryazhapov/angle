@@ -21,7 +21,7 @@ object ScheduleRepository extends Repository {
     ZLayer.fromService(new PostgresScheduleRepository(_))
 
   trait Service {
-    def create(schedule: Schedule): Task[Unit]
+    def create(schedule: Schedule): Task[ScheduleId]
 
     def update(schedule: Schedule): Task[Unit]
 
@@ -33,7 +33,7 @@ object ScheduleRepository extends Repository {
 
     def findIntersection(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): Task[List[Schedule]]
 
-    def findUnion(schedule: Schedule): Task[List[Schedule]]
+    def findUnion(id: UserId, start: ZonedDateTime, end: ZonedDateTime): Task[List[Schedule]]
 
     def delete(id: ScheduleId): Task[Unit]
   }
@@ -42,11 +42,12 @@ object ScheduleRepository extends Repository {
 
     lazy val scheduleTable = quote(querySchema[Schedule](""""Schedule""""))
 
-    override def create(schedule: Schedule): Task[Unit] =
+    override def create(schedule: Schedule): Task[ScheduleId] =
       dbContext.run {
         scheduleTable
           .insert(lift(schedule))
-      }.unit.transact(xa)
+          .returningGenerated(_.id)
+      }.transact(xa)
 
     override def update(schedule: Schedule): Task[Unit] =
       dbContext.run {
@@ -76,13 +77,13 @@ object ScheduleRepository extends Repository {
           .filter(x => x.startsAt <= lift(lessonStart) && x.endsAt >= lift(lessonEnd))
       }.transact(xa)
 
-    override def findUnion(schedule: Schedule): Task[List[Schedule]] =
+    override def findUnion(id: UserId, start: ZonedDateTime, end: ZonedDateTime): Task[List[Schedule]] =
       dbContext.run {
         scheduleTable
-          .filter(_.teacherId == lift(schedule.teacherId))
+          .filter(_.teacherId == lift(id))
           .filter(x =>
-            !(x.startsAt > lift(schedule.startsAt) && x.startsAt >= lift(schedule.endsAt)) &&
-              !(x.endsAt <= lift(schedule.startsAt) && x.endsAt < lift(schedule.endsAt))
+            !(x.startsAt > lift(start) && x.startsAt >= lift(end)) &&
+              !(x.endsAt <= lift(start) && x.endsAt < lift(end))
           )
       }.transact(xa)
 

@@ -2,19 +2,16 @@ package io.ryazhapov.api.lessons
 
 import io.circe.generic.auto._
 import io.ryazhapov.api.Api
-import io.ryazhapov.database.services.TransactorService.DBTransactor
 import io.ryazhapov.domain.accounts.Role.TeacherRole
 import io.ryazhapov.domain.auth.UserWithSession
-import io.ryazhapov.domain.lessons.Schedule
-import io.ryazhapov.errors.{ScheduleOverlapping, UnauthorizedAction}
+import io.ryazhapov.domain.lessons.ScheduleRequest
+import io.ryazhapov.errors.UnauthorizedAction
 import io.ryazhapov.services.lessons.ScheduleService
 import io.ryazhapov.services.lessons.ScheduleService.ScheduleService
 import org.http4s.{AuthedRoutes, HttpRoutes, Response}
 import zio.interop.catz._
 import zio.logging._
 import zio.{IO, ZIO}
-
-import java.time.ZonedDateTime
 
 class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
 
@@ -27,17 +24,9 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
 
         case TeacherRole if user.verified =>
           val handleRequest = for {
-            _ <- log.info(s"Creating schedule for ${user.id}")
-            request <- authReq.req.as[ScheduleRequest]
-            id = 0
-            schedule = Schedule(
-              id,
-              user.id,
-              request.startsAt,
-              request.endsAt
-            )
-            _ <- checkOverlapping(schedule)
-            result <- ScheduleService.createSchedule(schedule)
+            _ <- log.info(s"Creating schedule for ${user.email}")
+            scheduleReq <- authReq.req.as[ScheduleRequest]
+            result <- ScheduleService.createSchedule(user.id, scheduleReq)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,
@@ -52,17 +41,9 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
 
         case TeacherRole if user.verified =>
           val handleRequest = for {
-            request <- authReq.req.as[ScheduleRequest]
-            _ <- log.info(s"Updating schedule for ${user.id}")
-            found <- ScheduleService.getSchedule(id)
-            _ <- ZIO.when(user.id == found.teacherId)(ZIO.fail(UnauthorizedAction))
-            updated = Schedule(
-              found.id,
-              found.teacherId,
-              request.startsAt,
-              request.endsAt)
-            _ <- checkOverlapping(updated)
-            result <- ScheduleService.updateSchedule(updated)
+            scheduleReq <- authReq.req.as[ScheduleRequest]
+            _ <- log.info(s"Updating schedule for ${user.email}")
+            result <- ScheduleService.updateSchedule(user.id, id, scheduleReq)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,
@@ -121,17 +102,6 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
       }
   }
 
-  def checkOverlapping(schedule: Schedule): ZIO[ScheduleService with DBTransactor, Throwable, Unit] =
-    ScheduleService.isOverlapping(schedule).flatMap {
-      case true  => ZIO.fail(ScheduleOverlapping)
-      case false => ZIO.succeed(())
-    }
-
   override def routes: HttpRoutes[ApiTask] =
     authMiddleware(scheduleRoutes)
-
-  case class ScheduleRequest(
-    startsAt: ZonedDateTime,
-    endsAt: ZonedDateTime
-  )
 }

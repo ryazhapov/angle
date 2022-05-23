@@ -2,7 +2,6 @@ package io.ryazhapov.api.accounts
 
 import io.circe.generic.auto._
 import io.ryazhapov.api.Api
-import io.ryazhapov.domain.accounts.Admin
 import io.ryazhapov.domain.accounts.Role.AdminRole
 import io.ryazhapov.domain.auth.UserWithSession
 import io.ryazhapov.services.accounts.AdminService
@@ -19,27 +18,6 @@ class AdminApi[R <: Api.DefaultApiEnv with AdminService with UserService] extend
   import dsl._
 
   val adminRoutes: AuthedRoutes[UserWithSession, ApiTask] = AuthedRoutes.of[UserWithSession, ApiTask] {
-
-    case authReq @ PUT -> Root / "update" / IntVar(id) as UserWithSession(user, session) =>
-      user.role match {
-        case AdminRole if user.verified =>
-
-          val handleRequest = for {
-            _ <- log.info(s"Updating admin $id")
-            request <- authReq.req.as[Admin]
-            found <- AdminService.getAdmin(id)
-            updated = request.copy(userId = found.userId)
-            result <- AdminService.updateAdmin(updated)
-          } yield result
-
-          handleRequest.foldM(
-            throwableToHttpCode,
-            result => okWithCookie(result, session.id)
-          )
-
-        case _ => IO(Response(Unauthorized))
-      }
-
 
     case GET -> Root / IntVar(id) as UserWithSession(user, session) =>
       user.role match {

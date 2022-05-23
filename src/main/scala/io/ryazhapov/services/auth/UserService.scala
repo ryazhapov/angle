@@ -1,9 +1,12 @@
 package io.ryazhapov.services.auth
 
+import io.ryazhapov.database.repositories.accounts.{AdminRepository, StudentRepository, TeacherRepository}
 import io.ryazhapov.database.repositories.auth.{SessionRepository, UserRepository}
-import io.ryazhapov.domain.auth.{Session, User}
+import io.ryazhapov.domain.accounts.Role.{AdminRole, StudentRole, TeacherRole}
+import io.ryazhapov.domain.accounts.{Admin, Student, Teacher}
+import io.ryazhapov.domain.auth.{Session, SignUpRequest, User}
 import io.ryazhapov.domain.{Password, SessionId, UserId}
-import io.ryazhapov.errors.{IncorrectUserPassword, SessionNotFound, UserNotExist, UserNotFound}
+import io.ryazhapov.errors._
 import io.ryazhapov.utils.SecurityUtils
 import zio.macros.accessible
 import zio.{Has, Task, ZIO, ZLayer}
@@ -15,11 +18,15 @@ object UserService {
   lazy val live = ZLayer.fromServices[
     UserRepository.Service,
     SessionRepository.Service,
+    TeacherRepository.Service,
+    AdminRepository.Service,
+    StudentRepository.Service,
     UserService.Service
-  ]((userRepo, sessionRepo) => new ServiceImpl(userRepo, sessionRepo))
+  ]((userRepo, sessionRepo, teacherRepo, adminRepo, studentRepo) =>
+    new ServiceImpl(userRepo, sessionRepo, teacherRepo, adminRepo, studentRepo))
 
   trait Service {
-    def createUser(user: User): Task[UserId]
+    def createUser(request: SignUpRequest): Task[UserId]
 
     def updateUser(user: User): Task[Unit]
 
@@ -50,11 +57,35 @@ object UserService {
 
   class ServiceImpl(
     usersRepository: UserRepository.Service,
-    sessionsRepository: SessionRepository.Service
+    sessionsRepository: SessionRepository.Service,
+    teacherRepository: TeacherRepository.Service,
+    adminRepository: AdminRepository.Service,
+    studentRepository: StudentRepository.Service
   ) extends Service {
 
-    override def createUser(user: User): Task[UserId] =
-      usersRepository.create(user)
+    override def createUser(request: SignUpRequest): Task[UserId] =
+      for {
+        userOpt <- usersRepository.getByEmail(request.email)
+        _ <- userOpt match {
+          case None    => ZIO.succeed(())
+          case Some(_) => ZIO.fail(UserAlreadyExists)
+        }
+        salt = SecurityUtils.generateSalt()
+        user = User(
+          0,
+          request.email,
+          request.role,
+          if (request.role == AdminRole) true else false,
+          SecurityUtils.countSecretHash(request.password, salt),
+          salt
+        )
+        id <- usersRepository.create(user)
+        _ <- request.role match {
+          case AdminRole   => adminRepository.create(Admin(userId = id))
+          case TeacherRole => teacherRepository.create(Teacher(userId = id))
+          case StudentRole => studentRepository.create(Student(userId = id))
+        }
+      } yield id
 
     //TODO
     override def updateUser(user: User): Task[Unit] =

@@ -4,10 +4,7 @@ import io.circe.generic.auto._
 import io.ryazhapov.api.Api
 import io.ryazhapov.domain.accounts.Role.{AdminRole, StudentRole}
 import io.ryazhapov.domain.auth.UserWithSession
-import io.ryazhapov.domain.billing.Replenishment
-import io.ryazhapov.services.accounts.StudentService
-import io.ryazhapov.services.accounts.StudentService.StudentService
-import io.ryazhapov.services.auth.UserService
+import io.ryazhapov.domain.billing.ReplenishmentRequest
 import io.ryazhapov.services.billing.ReplenishmentService
 import io.ryazhapov.services.billing.ReplenishmentService.ReplenishmentService
 import org.http4s.{AuthedRoutes, HttpRoutes, Response}
@@ -15,7 +12,7 @@ import zio.IO
 import zio.interop.catz._
 import zio.logging._
 
-class ReplenishmentApi[R <: Api.DefaultApiEnv with ReplenishmentService with StudentService] extends Api[R] {
+class ReplenishmentApi[R <: Api.DefaultApiEnv with ReplenishmentService] extends Api[R] {
 
   import dsl._
 
@@ -25,18 +22,9 @@ class ReplenishmentApi[R <: Api.DefaultApiEnv with ReplenishmentService with Stu
       user.role match {
         case StudentRole =>
           val handleRequest = for {
-            _ <- log.info(s"Creating replenishment for ${user.id}")
-            foundStudent <- StudentService.getStudent(user.id)
-            request <- authReq.req.as[ReplenishmentRequest]
-            id = 0
-            replenishment = Replenishment(
-              id,
-              user.id,
-              request.amount
-            )
-            updStudent = foundStudent.copy(balance = foundStudent.balance + request.amount)
-            updUser = user.copy(verified = true)
-            result <- ReplenishmentService.createReplenishment(updUser, updStudent, replenishment)
+            _ <- log.info(s"Creating replenishment for ${user.email}")
+            replenishReq <- authReq.req.as[ReplenishmentRequest]
+            result <- ReplenishmentService.createReplenishment(user.id, replenishReq)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,
@@ -57,9 +45,9 @@ class ReplenishmentApi[R <: Api.DefaultApiEnv with ReplenishmentService with Stu
             throwableToHttpCode,
             result => okWithCookie(result, session.id)
           )
-        case StudentRole =>
+        case StudentRole                =>
           val handleRequest = for {
-            _ <- log.info(s"Getting all replenishments of student ${user.id}")
+            _ <- log.info(s"Getting all replenishments of student ${user.email}")
             result <- ReplenishmentService.getStudentsReplenishment(user.id)
           } yield result
           handleRequest.foldM(
@@ -73,8 +61,4 @@ class ReplenishmentApi[R <: Api.DefaultApiEnv with ReplenishmentService with Stu
 
   override def routes: HttpRoutes[ApiTask] =
     authMiddleware(replenishmentRoutes)
-
-  case class ReplenishmentRequest(
-    amount: Int
-  )
 }

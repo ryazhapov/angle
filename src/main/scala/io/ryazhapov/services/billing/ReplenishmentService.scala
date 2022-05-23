@@ -4,11 +4,10 @@ import io.ryazhapov.database.repositories.accounts.StudentRepository
 import io.ryazhapov.database.repositories.auth.UserRepository
 import io.ryazhapov.database.repositories.billing.ReplenishmentRepository
 import io.ryazhapov.domain.UserId
-import io.ryazhapov.domain.accounts.Student
-import io.ryazhapov.domain.auth.User
-import io.ryazhapov.domain.billing.Replenishment
+import io.ryazhapov.domain.billing.{Replenishment, ReplenishmentRequest}
+import io.ryazhapov.errors.{StudentNotFound, UserNotFound}
 import zio.macros.accessible
-import zio.{Has, Task, ZLayer}
+import zio.{Has, Task, ZIO, ZLayer}
 
 @accessible
 object ReplenishmentService {
@@ -24,7 +23,7 @@ object ReplenishmentService {
     new ServiceImpl(userRepo, studentRepo, replenishmentRepo))
 
   trait Service {
-    def createReplenishment(user: User, student: Student, replenishment: Replenishment): Task[Unit]
+    def createReplenishment(id: UserId, request: ReplenishmentRequest): Task[Unit]
 
     def getAllReplenishments: Task[List[Replenishment]]
 
@@ -37,11 +36,17 @@ object ReplenishmentService {
     replenishmentRepository: ReplenishmentRepository.Service
   ) extends Service {
 
-    override def createReplenishment(user: User, student: Student, replenishment: Replenishment): Task[Unit] =
+    override def createReplenishment(id: UserId, request: ReplenishmentRequest): Task[Unit] =
       for {
-        _ <- userRepository.update(user)
-        _ <- studentRepository.update(student)
-        _ <- replenishmentRepository.create(replenishment)
+        studentOpt <- studentRepository.get(id)
+        student <- ZIO.fromEither(studentOpt.toRight(StudentNotFound))
+        userOpt <- userRepository.get(id)
+        user <- ZIO.fromEither(userOpt.toRight(UserNotFound))
+        updStudent = student.copy(balance = student.balance + request.amount)
+        updUser = user.copy(verified = true)
+        _ <- userRepository.update(updUser)
+        _ <- studentRepository.update(updStudent)
+        _ <- replenishmentRepository.create(Replenishment(0, id, request.amount))
       } yield ()
 
     override def getAllReplenishments: Task[List[Replenishment]] =

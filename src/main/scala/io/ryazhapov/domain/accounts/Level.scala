@@ -51,4 +51,3 @@ object Level {
 
   case object Proficiency extends Level
 }
-

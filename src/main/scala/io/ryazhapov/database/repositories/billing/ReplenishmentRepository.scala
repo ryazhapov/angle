@@ -3,9 +3,8 @@ package io.ryazhapov.database.repositories.billing
 import doobie.implicits._
 import doobie.util.transactor.Transactor
 import io.ryazhapov.database.repositories.Repository
-import io.ryazhapov.database.repositories.lessons.ScheduleRepository.ScheduleRepository
 import io.ryazhapov.database.services.TransactorService.DBTransactor
-import io.ryazhapov.domain.UserId
+import io.ryazhapov.domain.{ReplenishmentId, UserId}
 import io.ryazhapov.domain.billing.Replenishment
 import zio.interop.catz._
 import zio.{Has, Task, URLayer, ZLayer}
@@ -20,7 +19,7 @@ object ReplenishmentRepository extends Repository {
     ZLayer.fromService(new PostgresReplenishmentRepository(_))
 
   trait Service {
-    def create(replenishment: Replenishment): Task[Unit]
+    def create(replenishment: Replenishment): Task[ReplenishmentId]
 
     def getAll: Task[List[Replenishment]]
 
@@ -31,11 +30,12 @@ object ReplenishmentRepository extends Repository {
 
     lazy val replenishmentTable = quote(querySchema[Replenishment](""""Replenishment""""))
 
-    override def create(replenishment: Replenishment): Task[Unit] =
+    override def create(replenishment: Replenishment): Task[ReplenishmentId] =
       dbContext.run {
         replenishmentTable
           .insert(lift(replenishment))
-      }.unit.transact(xa)
+          .returningGenerated(_.id)
+      }.transact(xa)
 
     override def getAll: Task[List[Replenishment]] =
       dbContext.run(replenishmentTable).transact(xa)

@@ -1,15 +1,11 @@
 package io.ryazhapov.services.accounts
 
 import io.ryazhapov.database.repositories.accounts.AdminRepository
-import io.ryazhapov.database.repositories.accounts.AdminRepository.AdminRepository
-import io.ryazhapov.database.services.TransactorService
-import io.ryazhapov.database.services.TransactorService.DBTransactor
 import io.ryazhapov.domain.UserId
 import io.ryazhapov.domain.accounts.Admin
 import io.ryazhapov.errors.AdminNotFound
-import zio.interop.catz._
 import zio.macros.accessible
-import zio.{Has, RIO, Task, ZIO, ZLayer}
+import zio.{Has, Task, ZIO, ZLayer}
 
 @accessible
 object AdminService {

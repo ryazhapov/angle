@@ -13,16 +13,16 @@
             <column name="email" type="varchar">
                 <constraints nullable="false" unique="true"/>
             </column>
-            <column name="passwordHash" type="varchar">
-                <constraints nullable="false"/>
-            </column>
-            <column name="salt" type="bytea">
-                <constraints nullable="false"/>
-            </column>
             <column name="role" type="varchar" defaultValue="student">
                 <constraints nullable="false"/>
             </column>
             <column name="verified" type="boolean" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="passwordHash" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="salt" type="bytea">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -52,6 +52,9 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="level" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target" type="varchar">
                 <constraints nullable="false"/>
             </column>
             <column name="balance" type="int" defaultValue="0">

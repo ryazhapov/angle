@@ -2,27 +2,18 @@ package io.ryazhapov.api.lessons
 
 import io.circe.generic.auto._
 import io.ryazhapov.api.Api
-import io.ryazhapov.database.services.TransactorService.DBTransactor
-import io.ryazhapov.domain.UserId
 import io.ryazhapov.domain.accounts.Role
 import io.ryazhapov.domain.accounts.Role.{AdminRole, StudentRole}
 import io.ryazhapov.domain.auth.UserWithSession
-import io.ryazhapov.domain.lessons.Lesson
-import io.ryazhapov.errors.{DeletingCompletedLesson, LessonOverlapping, NotEnoughMoney, ScheduleNotFound, UnauthorizedAction}
-import io.ryazhapov.services.accounts.TeacherService.TeacherService
-import io.ryazhapov.services.accounts.{StudentService, TeacherService}
+import io.ryazhapov.domain.lessons.LessonRequest
+import io.ryazhapov.services.lessons.LessonService
 import io.ryazhapov.services.lessons.LessonService.LessonService
-import io.ryazhapov.services.lessons.ScheduleService.ScheduleService
-import io.ryazhapov.services.lessons.{LessonService, ScheduleService}
 import org.http4s.{AuthedRoutes, HttpRoutes, Response}
+import zio.IO
 import zio.interop.catz._
 import zio.logging._
-import zio.{IO, ZIO}
 
-import java.time.ZonedDateTime
-
-class LessonApi[R <: Api.DefaultApiEnv with LessonService with
-  TeacherService with ScheduleService] extends Api[R] {
+class LessonApi[R <: Api.DefaultApiEnv with LessonService] extends Api[R] {
 
   import dsl._
 
@@ -33,30 +24,9 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
 
         case StudentRole if user.verified =>
           val handleRequest = for {
-            request <- authReq.req.as[LessonRequest]
-            foundStudent <- StudentService.getStudent(user.id)
-            foundTeacher <- TeacherService.getTeacher(request.teacherId)
-            _ <- log.info(s"Creating lesson for Student:${user.id} and Teacher:${foundTeacher.userId}")
-            _ <- ZIO.when(foundStudent.balance >= foundTeacher.rate)(ZIO.fail(NotEnoughMoney))
-            id = 0
-            lesson = Lesson(
-              id,
-              foundTeacher.userId,
-              user.id,
-              request.startsAt,
-              request.endsAt,
-              completed = false
-            )
-            _ <- checkOverlapping(lesson)
-            _ <- ScheduleService.findScheduleForLesson(lesson.startsAt, lesson.endsAt).flatMap {
-              case ::(_, _) => ZIO.succeed(())
-              case Nil      => ZIO.fail(ScheduleNotFound)
-            }
-            updatedStudent = foundStudent.copy(
-              balance = foundStudent.balance - foundTeacher.rate,
-              reserved = foundStudent.reserved + foundTeacher.rate
-            )
-            result <- StudentService.updateStudent(updatedStudent) *> LessonService.createLesson(lesson)
+            lessonReq <- authReq.req.as[LessonRequest]
+            _ <- log.info(s"Creating lesson for Student:${user.email} and Teacher:${lessonReq.teacherId}")
+            result <- LessonService.createLesson(user.id, lessonReq)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,
@@ -113,7 +83,7 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
 
         case _ =>
           val handleRequest = for {
-            _ <- log.info(s"Getting lesson for ${user.role} ${user.id}")
+            _ <- log.info(s"Getting lesson for ${user.role} ${user.email}")
             result <- LessonService.getLessonsByUser(user)
           } yield result
           handleRequest.foldM(
@@ -130,9 +100,9 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
         case _ =>
           val handleRequest = for {
             _ <- if (completed) {
-              log.info(s"Getting completed lessons for ${user.role} ${user.id}")
+              log.info(s"Getting completed lessons for ${user.role} ${user.email}")
             } else {
-              log.info(s"Getting upcoming lesson for ${user.role} ${user.id}")
+              log.info(s"Getting upcoming lesson for ${user.role} ${user.email}")
             }
             result <- LessonService.getLessonsByUserWithFilter(user, completed)
           } yield result
@@ -149,17 +119,7 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
         case _ if user.verified =>
           val handleRequest = for {
             _ <- log.info(s"Deleting lesson $id")
-            foundLesson <- LessonService.getLesson(id)
-            _ <- ZIO.when(!foundLesson.completed)(ZIO.fail(DeletingCompletedLesson))
-            _ <- ZIO.when(!(user.id != foundLesson.teacherId || user.id != foundLesson.studentId)
-            )(ZIO.fail(UnauthorizedAction))
-            foundStudent <- StudentService.getStudent(foundLesson.studentId)
-            foundTeacher <- TeacherService.getTeacher(foundLesson.teacherId)
-            updatedStudent = foundStudent.copy(
-              balance = foundStudent.balance + foundTeacher.rate,
-              reserved = foundStudent.reserved - foundTeacher.rate
-            )
-            result <- StudentService.updateStudent(updatedStudent) *> LessonService.deleteLesson(id)
+            result <- LessonService.deleteLesson(user.id, id)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,
@@ -168,18 +128,6 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService with
       }
   }
 
-  def checkOverlapping(lesson: Lesson): ZIO[LessonService with DBTransactor, Throwable, Unit] =
-    LessonService.isOverlapping(lesson).flatMap {
-      case true  => ZIO.fail(LessonOverlapping)
-      case false => ZIO.succeed(())
-    }
-
   override def routes: HttpRoutes[ApiTask] =
     authMiddleware(lessonRoutes)
-
-  case class LessonRequest(
-    teacherId: UserId,
-    startsAt: ZonedDateTime,
-    endsAt: ZonedDateTime
-  )
 }

@@ -3,18 +3,13 @@ package io.ryazhapov.api.auth
 import cats.implicits._
 import io.circe.generic.auto._
 import io.ryazhapov.api.Api
-import io.ryazhapov.domain.Password
-import io.ryazhapov.domain.accounts.Role.{AdminRole, StudentRole, TeacherRole}
-import io.ryazhapov.domain.accounts.{Admin, Role, Student, Teacher}
-import io.ryazhapov.domain.auth.{User, UserWithSession}
-import io.ryazhapov.errors.UserAlreadyExists
-import io.ryazhapov.services.accounts.{AdminService, StudentService, TeacherService}
+import io.ryazhapov.domain.accounts.Role.AdminRole
+import io.ryazhapov.domain.auth.{SignInRequest, SignUpRequest, UserWithSession}
 import io.ryazhapov.services.auth.UserService
-import io.ryazhapov.utils.SecurityUtils
 import org.http4s.{AuthedRoutes, HttpRoutes, Response}
+import zio.IO
 import zio.interop.catz._
 import zio.logging._
-import zio.{IO, ZIO}
 
 class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
 
@@ -23,30 +18,13 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
   val standardRoutes: HttpRoutes[ApiTask] = HttpRoutes.of[ApiTask] {
 
     case req @ POST -> Root / "sign_up" =>
-      val salt = SecurityUtils.generateSalt()
       val requestHandler = for {
-        apiUser <- req.as[SignUpUser]
-        _ <- log.info(s"Sign up attempt email = ${apiUser.email}")
-        _ <- UserService.userExists(apiUser.email).flatMap {
-          case true  => ZIO.fail(UserAlreadyExists)
-          case false => ZIO.succeed(())
-        }
-        newId <- UserService.createUser(User(
-          0,
-          apiUser.email,
-          SecurityUtils.countSecretHash(apiUser.password, salt),
-          salt,
-          apiUser.role,
-          if (apiUser.role == AdminRole) true else false
-        ))
-        _ <- apiUser.role match {
-          case AdminRole   => AdminService.createAdmin(Admin(userId = newId))
-          case TeacherRole => TeacherService.createTeacher(Teacher(userId = newId))
-          case StudentRole => StudentService.createStudent(Student(userId = newId))
-        }
-        sessionId <- UserService.addSession(newId)
-        _ <- log.info(s"User with email = ${apiUser.email} signed up successfully")
-      } yield (newId, sessionId)
+        reqUser <- req.as[SignUpRequest]
+        _ <- log.info(s"${reqUser.email} -- registration")
+        userId <- UserService.createUser(reqUser)
+        sessionId <- UserService.addSession(userId)
+        _ <- log.info(s"${reqUser.email} -- successful")
+      } yield (userId, sessionId)
 
       requestHandler.foldM(
         throwableToHttpCode,
@@ -55,11 +33,11 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
 
     case req @ POST -> Root / "sign_in" =>
       val requestHandler = for {
-        apiUser <- req.as[SignInUser]
-        _ <- log.info(s"User ${apiUser.email} try to login")
-        user <- UserService.validateUser(apiUser.email, apiUser.password)
+        reqUser <- req.as[SignInRequest]
+        _ <- log.info(s"${reqUser.email} -- login")
+        user <- UserService.validateUser(reqUser.email, reqUser.password)
         sessionId <- UserService.addSession(user.id)
-        _ <- log.info(s"User ${apiUser.email} logged in successfully")
+        _ <- log.info(s"${reqUser.email} -- success")
       } yield (user.id, sessionId)
 
       requestHandler.foldM(
@@ -82,7 +60,7 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
   val authedRoutes: AuthedRoutes[UserWithSession, ApiTask] = AuthedRoutes.of[UserWithSession, ApiTask] {
     case GET -> Root / "users" as UserWithSession(user, session) =>
       user.role match {
-        case AdminRole => log.info("Get users") *>
+        case AdminRole => log.info("Get all users") *>
           UserService.getAllUsers.foldM(
             throwableToHttpCode,
             result => okWithCookie(result, session.id))
@@ -92,7 +70,7 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
 
     case GET -> Root / "user" / IntVar(id) as UserWithSession(user, session) =>
       user.role match {
-        case AdminRole => log.info("Get user") *>
+        case AdminRole => log.info(s"Get user with $id") *>
           UserService.getUser(id).foldM(
             throwableToHttpCode,
             result => okWithCookie(result, session.id))
@@ -105,13 +83,9 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
         UserService.deleteSession(session.id).foldM(
           throwableToHttpCode,
           result => Ok(result)
-        ) <* log.info(s"User ${user.email} signed out successfully")
+        ) <* log.info(s"User signed out: ${user.email}")
   }
 
   override def routes: HttpRoutes[ApiTask] =
     standardRoutes <+> authMiddleware(authedRoutes)
-
-  case class SignInUser(email: String, password: Password)
-
-  case class SignUpUser(email: String, password: Password, role: Role)
 }

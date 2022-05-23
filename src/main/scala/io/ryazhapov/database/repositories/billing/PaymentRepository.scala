@@ -20,7 +20,7 @@ object PaymentRepository extends Repository {
   = ZLayer.fromService(new PostgresPaymentRepository(_))
 
   trait Service {
-    def create(payment: Payment): Task[Unit]
+    def create(payment: Payment): Task[PaymentId]
 
     def get(id: PaymentId): Task[Option[Payment]]
 
@@ -37,11 +37,12 @@ object PaymentRepository extends Repository {
 
     lazy val paymentTable = quote(querySchema[Payment](""""Payment""""))
 
-    override def create(payment: Payment): Task[Unit] =
+    override def create(payment: Payment): Task[PaymentId] =
       dbContext.run {
         paymentTable
           .insert(lift(payment))
-      }.unit.transact(xa)
+          .returningGenerated(_.id)
+      }.transact(xa)
 
     override def get(id: PaymentId): Task[Option[Payment]] =
       dbContext.run {

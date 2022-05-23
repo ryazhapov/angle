@@ -1,10 +1,11 @@
 package io.ryazhapov.services.lessons
 
-import io.ryazhapov.database.repositories.lessons.LessonRepository
-import io.ryazhapov.domain.LessonId
+import io.ryazhapov.database.repositories.accounts.{StudentRepository, TeacherRepository}
+import io.ryazhapov.database.repositories.lessons.{LessonRepository, ScheduleRepository}
 import io.ryazhapov.domain.auth.User
-import io.ryazhapov.domain.lessons.Lesson
-import io.ryazhapov.errors.{InvalidLessonTime, InvalidScheduleTime, LessonNotFound}
+import io.ryazhapov.domain.lessons.{Lesson, LessonRequest}
+import io.ryazhapov.domain.{LessonId, UserId}
+import io.ryazhapov.errors._
 import zio.macros.accessible
 import zio.{Has, Task, ZIO, ZLayer}
 
@@ -13,13 +14,17 @@ object LessonService {
 
   type LessonService = Has[Service]
 
-  lazy val live = ZLayer.fromService[
+  lazy val live = ZLayer.fromServices[
+    StudentRepository.Service,
+    TeacherRepository.Service,
+    ScheduleRepository.Service,
     LessonRepository.Service,
     LessonService.Service
-  ](repo => new ServiceImpl(repo))
+  ]((studentRepo, teacherRepo, scheduleRepo, lessonRepo) =>
+    new ServiceImpl(studentRepo, teacherRepo, scheduleRepo, lessonRepo))
 
   trait Service {
-    def createLesson(lesson: Lesson): Task[Unit]
+    def createLesson(id: UserId, request: LessonRequest): Task[LessonId]
 
     def completeLesson(id: LessonId): Task[Unit]
 
@@ -33,20 +38,48 @@ object LessonService {
 
     def getLessonsByUserWithFilter(user: User, completed: Boolean): Task[List[Lesson]]
 
-    def isOverlapping(lesson: Lesson): Task[Boolean]
-
-    def deleteLesson(id: LessonId): Task[Unit]
+    def deleteLesson(id: UserId, lessonId: LessonId): Task[Unit]
   }
 
   class ServiceImpl(
+    studentRepository: StudentRepository.Service,
+    teacherRepository: TeacherRepository.Service,
+    scheduleRepository: ScheduleRepository.Service,
     lessonRepository: LessonRepository.Service
   ) extends Service {
 
-    override def createLesson(lesson: Lesson): Task[Unit] =
+    override def createLesson(id: UserId, request: LessonRequest): Task[LessonId] =
       for {
-        _ <- ZIO.cond(lesson.valid, (), InvalidLessonTime)
-        _ <- lessonRepository.create(lesson).unit
-      } yield ()
+        _ <- ZIO.when(request.isValid)(ZIO.fail(InvalidScheduleTime))
+        studentOpt <- studentRepository.get(id)
+        student <- ZIO.fromEither(studentOpt.toRight(StudentNotFound))
+        teacherOpt <- teacherRepository.get(id)
+        teacher <- ZIO.fromEither(teacherOpt.toRight(TeacherNotFound))
+        _ <- ZIO.when(student.balance >= teacher.rate)(ZIO.fail(NotEnoughMoney))
+        _ <- scheduleRepository.findIntersection(request.startsAt, request.endsAt).flatMap {
+          case ::(_, _) => ZIO.succeed(())
+          case Nil      => ZIO.fail(ScheduleNotFound)
+        }
+        lesson = Lesson(
+          0,
+          teacher.userId,
+          id,
+          request.startsAt,
+          request.endsAt,
+          completed = false
+        )
+        schedules <- lessonRepository.findUnion(lesson)
+        _ = schedules match {
+          case ::(_, _) => ZIO.succeed(())
+          case Nil      => ZIO.fail(LessonOverlapping)
+        }
+        updStudent = student.copy(
+          balance = student.balance - teacher.rate,
+          reserved = student.reserved + teacher.rate
+        )
+        _ <- studentRepository.update(updStudent)
+        lessonId <- lessonRepository.create(lesson)
+      } yield lessonId
 
     override def completeLesson(id: LessonId): Task[Unit] =
       for {
@@ -74,17 +107,24 @@ object LessonService {
     override def getLessonsByUserWithFilter(user: User, completed: Boolean): Task[List[Lesson]] =
       lessonRepository.getByUserFiltered(user, completed)
 
-    override def isOverlapping(lesson: Lesson): Task[Boolean] =
+    override def deleteLesson(id: UserId, lessonId: LessonId): Task[Unit] = {
       for {
-        _ <- ZIO.cond(lesson.valid, (), InvalidScheduleTime)
-        schedules <- lessonRepository.findUnion(lesson)
-        result = schedules match {
-          case ::(_, _) => true
-          case Nil      => false
-        }
-      } yield result
+        lessonOpt <- lessonRepository.get(lessonId)
+        lesson <- ZIO.fromEither(lessonOpt.toRight(LessonNotFound))
+        _ <- ZIO.when(!lesson.completed)(ZIO.fail(DeletingCompletedLesson))
+        _ <- ZIO.when(!(id != lesson.teacherId || id != lesson.studentId))(ZIO.fail(UnauthorizedAction))
+        studentOpt <- studentRepository.get(lesson.studentId)
+        student <- ZIO.fromEither(studentOpt.toRight(StudentNotFound))
+        teacherOpt <- teacherRepository.get(lesson.teacherId)
+        teacher <- ZIO.fromEither(teacherOpt.toRight(TeacherNotFound))
+        updStudent = student.copy(
+          balance = student.balance + teacher.rate,
+          reserved = student.reserved - teacher.rate
+        )
+        _ <- studentRepository.update(updStudent)
+        _ <- lessonRepository.delete(lessonId)
+      } yield ()
 
-    override def deleteLesson(id: LessonId): Task[Unit] =
-      lessonRepository.delete(id)
+    }
   }
 }

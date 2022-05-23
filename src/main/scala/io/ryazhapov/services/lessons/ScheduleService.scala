@@ -1,9 +1,9 @@
 package io.ryazhapov.services.lessons
 
 import io.ryazhapov.database.repositories.lessons.ScheduleRepository
-import io.ryazhapov.domain.lessons.Schedule
+import io.ryazhapov.domain.lessons.{Schedule, ScheduleRequest}
 import io.ryazhapov.domain.{ScheduleId, UserId}
-import io.ryazhapov.errors.{InvalidScheduleTime, ScheduleNotFound}
+import io.ryazhapov.errors.{InvalidScheduleTime, ScheduleNotFound, ScheduleOverlapping, UnauthorizedAction}
 import zio.macros.accessible
 import zio.{Has, Task, ZIO, ZLayer}
 
@@ -20,9 +20,9 @@ object ScheduleService {
   ](repo => new ServiceImpl(repo))
 
   trait Service {
-    def createSchedule(schedule: Schedule): Task[Unit]
+    def createSchedule(id: UserId, request: ScheduleRequest): Task[ScheduleId]
 
-    def updateSchedule(schedule: Schedule): Task[Unit]
+    def updateSchedule(id: UserId, scheduleId: ScheduleId, request: ScheduleRequest): Task[Unit]
 
     def getSchedule(id: ScheduleId): Task[Schedule]
 
@@ -32,8 +32,6 @@ object ScheduleService {
 
     def findScheduleForLesson(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): Task[List[Schedule]]
 
-    def isOverlapping(schedule: Schedule): Task[Boolean]
-
     def deleteSchedule(id: ScheduleId): Task[Unit]
   }
 
@@ -41,17 +39,36 @@ object ScheduleService {
     scheduleRepository: ScheduleRepository.Service
   ) extends Service {
 
-    override def createSchedule(schedule: Schedule): Task[Unit] = {
+    override def createSchedule(id: UserId, request: ScheduleRequest): Task[ScheduleId] = {
       for {
-        _ <- ZIO.cond(schedule.valid, (), InvalidScheduleTime)
-        _ <- scheduleRepository.create(schedule)
-      } yield ()
+        _ <- ZIO.when(request.isValid)(ZIO.fail(InvalidScheduleTime))
+        schedules <- scheduleRepository.findUnion(id, request.startsAt, request.endsAt)
+        _ <- schedules match {
+          case ::(_, _) => ZIO.fail(ScheduleOverlapping)
+          case Nil      => ZIO.succeed(())
+        }
+        scheduleId <- scheduleRepository.create(Schedule(0, id, request.startsAt, request.endsAt))
+      } yield scheduleId
     }
 
-    override def updateSchedule(schedule: Schedule): Task[Unit] =
+    override def updateSchedule(id: UserId, scheduleId: ScheduleId, request: ScheduleRequest): Task[Unit] =
       for {
-        _ <- ZIO.cond(schedule.valid, (), InvalidScheduleTime)
-        _ <- scheduleRepository.update(schedule)
+        _ <- ZIO.when(request.isValid)(ZIO.fail(InvalidScheduleTime))
+        scheduleOpt <- scheduleRepository.get(scheduleId)
+        schedule <- ZIO.fromEither(scheduleOpt.toRight(ScheduleNotFound))
+        _ <- ZIO.when(id == schedule.teacherId)(ZIO.fail(UnauthorizedAction))
+        schedules <- scheduleRepository.findUnion(id, request.startsAt, request.endsAt)
+        _ <- schedules match {
+          case ::(_, _) => ZIO.fail(ScheduleOverlapping)
+          case Nil      => ZIO.succeed(())
+        }
+        updated = Schedule(
+          schedule.id,
+          schedule.teacherId,
+          request.startsAt,
+          request.endsAt
+        )
+        _ <- scheduleRepository.update(updated)
       } yield ()
 
     override def getSchedule(id: ScheduleId): Task[Schedule] =
@@ -68,16 +85,6 @@ object ScheduleService {
 
     override def findScheduleForLesson(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): Task[List[Schedule]] =
       scheduleRepository.findIntersection(lessonStart, lessonEnd)
-
-    override def isOverlapping(schedule: Schedule): Task[Boolean] =
-      for {
-        _ <- ZIO.cond(schedule.valid, (), InvalidScheduleTime)
-        schedules <- scheduleRepository.findUnion(schedule)
-        result = schedules match {
-          case ::(_, _) => true
-          case Nil      => false
-        }
-      } yield result
 
     override def deleteSchedule(id: ScheduleId): Task[Unit] =
       scheduleRepository.delete(id)

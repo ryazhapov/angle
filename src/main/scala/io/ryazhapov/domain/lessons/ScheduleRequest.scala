@@ -1,16 +1,10 @@
 package io.ryazhapov.domain.lessons
 
-import io.ryazhapov.domain.{LessonId, UserId}
-
 import java.time.ZonedDateTime
 
-case class Lesson(
-  id: LessonId,
-  teacherId: UserId,
-  studentId: UserId,
+case class ScheduleRequest(
   startsAt: ZonedDateTime,
-  endsAt: ZonedDateTime,
-  completed: Boolean
+  endsAt: ZonedDateTime
 ) {
   def isValid: Boolean =
     startsAt.isBefore(endsAt) && !startsAt.isEqual(endsAt)

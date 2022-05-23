@@ -58,13 +58,13 @@ trait Environment {
       TransactorService.live >+>
       SessionRepository.live >+>
       MigrationService.liquibaseLayer >+> MigrationService.live >+>
-      UserRepository.live >+> UserService.live >+>
       TeacherRepository.live >+> TeacherService.live >+>
       AdminRepository.live >+> AdminService.live >+>
-      LessonRepository.live >+> LessonService.live >+>
       StudentRepository.live >+> StudentService.live >+>
+      UserRepository.live >+> UserService.live >+>
       ReplenishmentRepository.live >+> ReplenishmentService.live >+>
+      ScheduleRepository.live >+> ScheduleService.live >+>
+      LessonRepository.live >+> LessonService.live >+>
       PaymentRepository.live >+> PaymentService.live >+>
-      WithdrawalRepository.live >+> WithdrawalService.live >+>
-      ScheduleRepository.live >+> ScheduleService.live
+      WithdrawalRepository.live >+> WithdrawalService.live
 }

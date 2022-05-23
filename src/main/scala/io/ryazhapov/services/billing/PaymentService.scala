@@ -3,11 +3,9 @@ package io.ryazhapov.services.billing
 import io.ryazhapov.database.repositories.accounts.{StudentRepository, TeacherRepository}
 import io.ryazhapov.database.repositories.billing.PaymentRepository
 import io.ryazhapov.database.repositories.lessons.LessonRepository
-import io.ryazhapov.domain.accounts.{Student, Teacher}
 import io.ryazhapov.domain.billing.Payment
-import io.ryazhapov.domain.lessons.Lesson
 import io.ryazhapov.domain.{LessonId, PaymentId, UserId}
-import io.ryazhapov.errors.PaymentNotFound
+import io.ryazhapov.errors._
 import zio.macros.accessible
 import zio.{Has, Task, ZIO, ZLayer}
 
@@ -26,7 +24,7 @@ object PaymentService {
     new ServiceImpl(studentRepo, teacherRepo, lessonRepo, paymentRepo))
 
   trait Service {
-    def createPayment(student: Student, teacher: Teacher, lesson: Lesson, payment: Payment): Task[Unit]
+    def createPayment(id: UserId, lessonId: LessonId): Task[Unit]
 
     def getPayment(id: PaymentId): Task[Payment]
 
@@ -46,13 +44,23 @@ object PaymentService {
     paymentRepository: PaymentRepository.Service
   ) extends Service {
 
-    override def createPayment(student: Student, teacher: Teacher, lesson: Lesson, payment: Payment): Task[Unit] = {
+    override def createPayment(id: UserId, lessonId: LessonId): Task[Unit] = {
       for {
-        _ <- studentRepository.update(student)
-        _ <- teacherRepository.update(teacher)
-        _ <- lessonRepository.update(lesson)
-        _ <- paymentRepository.create(payment)
-      } yield ()
+        lessonOpt <- lessonRepository.get(lessonId)
+        lesson <- ZIO.fromEither(lessonOpt.toRight(LessonNotFound))
+        _ <- ZIO.when(id == lesson.teacherId)(ZIO.fail(UnauthorizedAction))
+        studentOpt <- studentRepository.get(lesson.studentId)
+        student <- ZIO.fromEither(studentOpt.toRight(StudentNotFound))
+        teacherOpt <- teacherRepository.get(id)
+        teacher <- ZIO.fromEither(teacherOpt.toRight(TeacherNotFound))
+        updStudent = student.copy(balance = student.reserved - teacher.rate)
+        updTeacher = teacher.copy(balance = teacher.balance + teacher.rate)
+        updLesson = lesson.copy(completed = true)
+        _ <- studentRepository.update(updStudent)
+        _ <- teacherRepository.update(updTeacher)
+        _ <- lessonRepository.update(updLesson)
+        paymentId <- paymentRepository.create(Payment(0, student.userId, id, lessonId, teacher.rate))
+      } yield paymentId
     }
 
     override def getPayment(id: PaymentId): Task[Payment] =

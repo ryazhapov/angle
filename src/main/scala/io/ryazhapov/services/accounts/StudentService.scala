@@ -2,7 +2,7 @@ package io.ryazhapov.services.accounts
 
 import io.ryazhapov.database.repositories.accounts.StudentRepository
 import io.ryazhapov.domain.UserId
-import io.ryazhapov.domain.accounts.Student
+import io.ryazhapov.domain.accounts.{Student, StudentUpdateRequest}
 import io.ryazhapov.errors.StudentNotFound
 import zio.macros.accessible
 import zio.{Has, Task, ZIO, ZLayer}
@@ -19,7 +19,7 @@ object StudentService {
   trait Service {
     def createStudent(student: Student): Task[Unit]
 
-    def updateStudent(student: Student): Task[Unit]
+    def updateStudent(id: UserId, request: StudentUpdateRequest): Task[Unit]
 
     def getStudent(id: UserId): Task[Student]
 
@@ -35,8 +35,13 @@ object StudentService {
     override def createStudent(student: Student): Task[Unit] =
       studentRepository.create(student)
 
-    override def updateStudent(student: Student): Task[Unit] =
-      studentRepository.update(student)
+    override def updateStudent(id: UserId, request: StudentUpdateRequest): Task[Unit] =
+      for {
+        studentOpt <- studentRepository.get(id)
+        student <- ZIO.fromEither(studentOpt.toRight(StudentNotFound))
+        updated = student.copy(target = request.target)
+        _ <- studentRepository.update(updated)
+      } yield ()
 
     override def getStudent(id: UserId): Task[Student] =
       for {

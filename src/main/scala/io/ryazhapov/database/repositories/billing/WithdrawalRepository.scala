@@ -3,10 +3,9 @@ package io.ryazhapov.database.repositories.billing
 import doobie.implicits._
 import doobie.util.transactor.Transactor
 import io.ryazhapov.database.repositories.Repository
-import io.ryazhapov.database.repositories.lessons.ScheduleRepository.ScheduleRepository
 import io.ryazhapov.database.services.TransactorService.DBTransactor
-import io.ryazhapov.domain.UserId
 import io.ryazhapov.domain.billing.Withdrawal
+import io.ryazhapov.domain.{UserId, WithdrawalId}
 import zio.interop.catz._
 import zio.{Has, Task, URLayer, ZLayer}
 
@@ -20,7 +19,7 @@ object WithdrawalRepository extends Repository {
     ZLayer.fromService(new PostgresWithdrawalRepository(_))
 
   trait Service {
-    def create(withdrawal: Withdrawal): Task[Unit]
+    def create(withdrawal: Withdrawal): Task[WithdrawalId]
 
     def getAll: Task[List[Withdrawal]]
 
@@ -31,11 +30,12 @@ object WithdrawalRepository extends Repository {
 
     lazy val withdrawalTable = quote(querySchema[Withdrawal](""""Withdrawal""""))
 
-    override def create(withdrawal: Withdrawal): Task[Unit] =
+    override def create(withdrawal: Withdrawal): Task[WithdrawalId] =
       dbContext.run {
         withdrawalTable
           .insert(lift(withdrawal))
-      }.unit.transact(xa)
+          .returningGenerated(_.id)
+      }.transact(xa)
 
     override def getAll: Task[List[Withdrawal]] =
       dbContext.run(withdrawalTable).transact(xa)

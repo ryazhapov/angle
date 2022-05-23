@@ -21,7 +21,7 @@ object LessonRepository extends Repository {
     ZLayer.fromService(new PostgresLessonRepository(_))
 
   trait Service {
-    def create(lesson: Lesson): Task[Unit]
+    def create(lesson: Lesson): Task[LessonId]
 
     def update(lesson: Lesson): Task[Unit]
 
@@ -43,11 +43,12 @@ object LessonRepository extends Repository {
   class PostgresLessonRepository(xa: Transactor[Task]) extends Service {
     lazy val lessonTable = quote(querySchema[Lesson](""""Lesson""""))
 
-    override def create(lesson: Lesson): Task[Unit] =
+    override def create(lesson: Lesson): Task[LessonId] =
       dbContext.run {
         lessonTable
           .insert(lift(lesson))
-      }.unit.transact(xa)
+          .returningGenerated(_.id)
+      }.transact(xa)
 
     override def update(lesson: Lesson): Task[Unit] =
       dbContext.run {

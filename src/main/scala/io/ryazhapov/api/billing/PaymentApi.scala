@@ -4,18 +4,14 @@ import io.circe.generic.auto._
 import io.ryazhapov.api.Api
 import io.ryazhapov.domain.accounts.Role.TeacherRole
 import io.ryazhapov.domain.auth.UserWithSession
-import io.ryazhapov.domain.billing.Payment
-import io.ryazhapov.errors.UnauthorizedAction
 import io.ryazhapov.services.accounts.TeacherService.TeacherService
-import io.ryazhapov.services.accounts.{StudentService, TeacherService}
 import io.ryazhapov.services.billing.PaymentService
 import io.ryazhapov.services.billing.PaymentService.PaymentService
-import io.ryazhapov.services.lessons.LessonService
 import io.ryazhapov.services.lessons.LessonService.LessonService
 import org.http4s.{AuthedRoutes, HttpRoutes, Response}
+import zio.IO
 import zio.interop.catz._
 import zio.logging._
-import zio.{IO, ZIO}
 
 class PaymentApi[R <: Api.DefaultApiEnv with PaymentService with LessonService with TeacherService] extends Api[R] {
 
@@ -28,22 +24,7 @@ class PaymentApi[R <: Api.DefaultApiEnv with PaymentService with LessonService w
         case TeacherRole if user.verified =>
           val handleRequest = for {
             _ <- log.info(s"Creating payment for lesson {$lessonId")
-            foundLesson <- LessonService.getLesson(lessonId)
-            foundTeacher <- TeacherService.getTeacher(user.id)
-            foundStudent <- StudentService.getStudent(foundLesson.studentId)
-            _ <- ZIO.when(user.id == foundLesson.teacherId)(ZIO.fail(UnauthorizedAction))
-            id = 0
-            payment = Payment(
-              id,
-              foundLesson.studentId,
-              foundLesson.teacherId,
-              foundLesson.id,
-              foundTeacher.rate
-            )
-            updStudent = foundStudent.copy(balance = foundStudent.balance - foundTeacher.rate)
-            updTeacher = foundTeacher.copy(balance = foundTeacher.balance + foundTeacher.rate)
-            updLesson = foundLesson.copy(completed = true)
-            result <- PaymentService.createPayment(updStudent, updTeacher, updLesson, payment)
+            result <- PaymentService.createPayment(user.id, lessonId)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,
