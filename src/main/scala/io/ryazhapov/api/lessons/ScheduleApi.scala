@@ -5,13 +5,12 @@ import io.ryazhapov.api.Api
 import io.ryazhapov.domain.accounts.Role.TeacherRole
 import io.ryazhapov.domain.auth.UserWithSession
 import io.ryazhapov.domain.lessons.ScheduleRequest
-import io.ryazhapov.errors.UnauthorizedAction
 import io.ryazhapov.services.lessons.ScheduleService
 import io.ryazhapov.services.lessons.ScheduleService.ScheduleService
 import org.http4s.{AuthedRoutes, HttpRoutes, Response}
+import zio.IO
 import zio.interop.catz._
 import zio.logging._
-import zio.{IO, ZIO}
 
 class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
 
@@ -36,7 +35,7 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
         case _ => IO(Response(Unauthorized))
       }
 
-    case authReq @ PUT -> Root / "update" :? ScheduleIdParamMatcher(id) as UserWithSession(user, session) =>
+    case authReq @ PUT -> Root / "update" / IntVar(id) as UserWithSession(user, session) =>
       user.role match {
 
         case TeacherRole if user.verified =>
@@ -63,7 +62,7 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
         result => okWithCookie(result, session.id)
       )
 
-    case GET -> Root as UserWithSession(_, session) =>
+    case GET -> Root / "all" as UserWithSession(_, session) =>
       val handleRequest = for {
         _ <- log.info(s"Getting all schedules")
         result <- ScheduleService.getAllSchedules
@@ -89,9 +88,7 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
         case TeacherRole if user.verified =>
           val handleRequest = for {
             _ <- log.info(s"Deleting schedule $id")
-            found <- ScheduleService.getSchedule(id)
-            _ <- ZIO.when(user.id == found.teacherId)(ZIO.fail(UnauthorizedAction))
-            result <- ScheduleService.deleteSchedule(id)
+            result <- ScheduleService.deleteSchedule(user.id, id)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,

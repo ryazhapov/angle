@@ -19,7 +19,7 @@ class PaymentApi[R <: Api.DefaultApiEnv with PaymentService with LessonService w
 
   val paymentRoutes: AuthedRoutes[UserWithSession, ApiTask] = AuthedRoutes.of[UserWithSession, ApiTask] {
 
-    case POST -> Root / "lesson_completed" :? LessonIdParamMatcher(lessonId) as UserWithSession(user, session) =>
+    case POST -> Root / "lesson_completed" / IntVar(lessonId) as UserWithSession(user, session) =>
       user.role match {
         case TeacherRole if user.verified =>
           val handleRequest = for {
@@ -44,10 +44,10 @@ class PaymentApi[R <: Api.DefaultApiEnv with PaymentService with LessonService w
         result => okWithCookie(result, session.id)
       )
 
-    case GET -> Root as UserWithSession(_, session) =>
+    case GET -> Root as UserWithSession(user, session) =>
       val handleRequest = for {
         _ <- log.info(s"Getting all payments")
-        result <- PaymentService.getAllPayments
+        result <- PaymentService.getAllPayments(user)
       } yield result
       handleRequest.foldM(
         throwableToHttpCode,

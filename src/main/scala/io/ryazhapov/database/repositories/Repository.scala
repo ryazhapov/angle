@@ -1,7 +1,7 @@
 package io.ryazhapov.database.repositories
 
 import doobie.quill.DoobieContext
-import io.getquill.{CompositeNamingStrategy2, Escape, Literal, SnakeCase}
+import io.getquill.{CompositeNamingStrategy2, Escape, Literal}
 import io.ryazhapov.database.services.TransactorService
 
 import java.sql.{Timestamp, Types}

@@ -34,12 +34,13 @@ import io.ryazhapov.services.billing.{PaymentService, ReplenishmentService, With
 import io.ryazhapov.services.lessons.LessonService.LessonService
 import io.ryazhapov.services.lessons.ScheduleService.ScheduleService
 import io.ryazhapov.services.lessons.{LessonService, ScheduleService}
+import zio.blocking.Blocking
 import zio.magic._
 import zio.{ZEnv, ZLayer}
 
 trait Environment {
 
-  type AppEnvironment = ZEnv with Services
+  type AppEnvironment = ZEnv with Services with Blocking
 
   type Services = AdminRepository with
     AdminService with

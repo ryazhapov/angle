@@ -26,8 +26,6 @@ object LessonService {
   trait Service {
     def createLesson(id: UserId, request: LessonRequest): Task[LessonId]
 
-    def completeLesson(id: LessonId): Task[Unit]
-
     def getLesson(id: LessonId): Task[Lesson]
 
     def getAllLessons: Task[List[Lesson]]
@@ -50,13 +48,13 @@ object LessonService {
 
     override def createLesson(id: UserId, request: LessonRequest): Task[LessonId] =
       for {
-        _ <- ZIO.when(request.isValid)(ZIO.fail(InvalidScheduleTime))
         studentOpt <- studentRepository.get(id)
         student <- ZIO.fromEither(studentOpt.toRight(StudentNotFound))
-        teacherOpt <- teacherRepository.get(id)
+        teacherOpt <- teacherRepository.get(request.teacherId)
         teacher <- ZIO.fromEither(teacherOpt.toRight(TeacherNotFound))
-        _ <- ZIO.when(student.balance >= teacher.rate)(ZIO.fail(NotEnoughMoney))
-        _ <- scheduleRepository.findIntersection(request.startsAt, request.endsAt).flatMap {
+        lessonEnd = request.startsAt.plusHours(1)
+        _ <- ZIO.when(student.balance < teacher.rate)(ZIO.fail(NotEnoughMoney))
+        _ <- scheduleRepository.findIntersection(request.startsAt, lessonEnd).flatMap {
           case ::(_, _) => ZIO.succeed(())
           case Nil      => ZIO.fail(ScheduleNotFound)
         }
@@ -65,29 +63,20 @@ object LessonService {
           teacher.userId,
           id,
           request.startsAt,
-          request.endsAt,
+          lessonEnd,
           completed = false
         )
         schedules <- lessonRepository.findUnion(lesson)
-        _ = schedules match {
-          case ::(_, _) => ZIO.succeed(())
-          case Nil      => ZIO.fail(LessonOverlapping)
+        _ <- schedules match {
+          case ::(_, _) => ZIO.fail(LessonOverlapping)
+          case Nil      => ZIO.succeed(())
         }
         updStudent = student.copy(
           balance = student.balance - teacher.rate,
           reserved = student.reserved + teacher.rate
         )
-        _ <- studentRepository.update(updStudent)
-        lessonId <- lessonRepository.create(lesson)
+        lessonId <- lessonRepository.create(updStudent, lesson)
       } yield lessonId
-
-    override def completeLesson(id: LessonId): Task[Unit] =
-      for {
-        lessonOpt <- lessonRepository.get(id)
-        lesson <- ZIO.fromEither(lessonOpt.toRight(LessonNotFound))
-        completed = lesson.copy(completed = true)
-        _ <- lessonRepository.update(completed).unit
-      } yield ()
 
     override def getLesson(id: LessonId): Task[Lesson] =
       for {
@@ -111,8 +100,8 @@ object LessonService {
       for {
         lessonOpt <- lessonRepository.get(lessonId)
         lesson <- ZIO.fromEither(lessonOpt.toRight(LessonNotFound))
-        _ <- ZIO.when(!lesson.completed)(ZIO.fail(DeletingCompletedLesson))
-        _ <- ZIO.when(!(id != lesson.teacherId || id != lesson.studentId))(ZIO.fail(UnauthorizedAction))
+        _ <- ZIO.when(lesson.completed)(ZIO.fail(DeletingCompletedLesson))
+        _ <- ZIO.when(id != lesson.teacherId && id != lesson.studentId)(ZIO.fail(UnauthorizedAction))
         studentOpt <- studentRepository.get(lesson.studentId)
         student <- ZIO.fromEither(studentOpt.toRight(StudentNotFound))
         teacherOpt <- teacherRepository.get(lesson.teacherId)
@@ -121,8 +110,7 @@ object LessonService {
           balance = student.balance + teacher.rate,
           reserved = student.reserved - teacher.rate
         )
-        _ <- studentRepository.update(updStudent)
-        _ <- lessonRepository.delete(lessonId)
+        _ <- lessonRepository.delete(updStudent, lessonId)
       } yield ()
 
     }

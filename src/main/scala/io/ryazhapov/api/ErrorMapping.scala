@@ -19,6 +19,7 @@ trait ErrorMapping[R <: Api.DefaultApiEnv] {
       case NotEnoughMoney          => BadRequest(e.getMessage)
       case UnauthorizedAction      => BadRequest(e.getMessage)
       case DeletingCompletedLesson => BadRequest(e.getMessage)
+      case LessonAlreadyPaid       => BadRequest(e.getMessage)
 
       case UserAlreadyExists    => Conflict(e.getMessage)
       case TeacherAlreadyExists => Conflict(e.getMessage)

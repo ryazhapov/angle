@@ -6,7 +6,7 @@ package object errors {
 
   case class UserNotExist(email: String) extends AppError(s"User with name=$email does not exist")
 
-  case object UserNotFound extends AppError("User not found for session")
+  case object UserNotFound extends AppError("User not found")
 
   case object SessionCookieIsAbsent extends AppError("Session cookie is absent")
 
@@ -47,6 +47,8 @@ package object errors {
   case object InvalidLessonTime extends AppError("Invalid lesson time: Duration is zero or negative")
 
   case object UnauthorizedAction extends AppError("Performing unauthorized actions")
+
+  case object LessonAlreadyPaid extends AppError("Lesson already paid")
 
   case object DeletingCompletedLesson extends AppError("Deleting already completed lesson")
 

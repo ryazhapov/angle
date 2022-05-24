@@ -1,7 +1,7 @@
 package io.ryazhapov.server
 
 import cats.effect.{ExitCode => CatsExitCode}
-import io.ryazhapov.api.accounts.{AdminApi, TeacherApi}
+import io.ryazhapov.api.accounts.{AdminApi, StudentApi, TeacherApi}
 import io.ryazhapov.api.auth.AuthApi
 import io.ryazhapov.api.billing.{PaymentApi, ReplenishmentApi, WithdrawalApi}
 import io.ryazhapov.api.lessons.{LessonApi, ScheduleApi}
@@ -19,14 +19,15 @@ object Server extends Environment {
   type AppTask[A] = RIO[AppEnvironment, A]
 
   val httpApp = Router[AppTask](
-    "/api/auth" -> new AuthApi().routes,
-    "/api/teacher" -> new TeacherApi().routes,
-    "/api/admin" -> new AdminApi().routes,
-    "/api/schedule" -> new ScheduleApi().routes,
-    "/api/lesson" -> new LessonApi().routes,
-    "/api/replenishment" -> new ReplenishmentApi().routes,
-    "/api/payment" -> new PaymentApi().routes,
-    "/api/withdrawal" -> new WithdrawalApi().routes
+    "/api/v1/auth" -> new AuthApi().routes,
+    "/api/v1/teacher" -> new TeacherApi().routes,
+    "/api/v1/student" -> new StudentApi().routes,
+    "/api/v1/admin" -> new AdminApi().routes,
+    "/api/v1/schedule" -> new ScheduleApi().routes,
+    "/api/v1/lesson" -> new LessonApi().routes,
+    "/api/v1/replenishment" -> new ReplenishmentApi().routes,
+    "/api/v1/payment" -> new PaymentApi().routes,
+    "/api/v1/withdrawal" -> new WithdrawalApi().routes
   ).orNotFound
 
   val server = for {

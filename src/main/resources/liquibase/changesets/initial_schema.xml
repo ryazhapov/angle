@@ -102,7 +102,7 @@
 
     <changeSet id="create Schedule table" author="ryazhapov">
         <createTable tableName="Schedule">
-            <column name="id" type="int">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="teacherId" type="int">
@@ -126,7 +126,7 @@
 
     <changeSet id="create Lesson table" author="ryazhapov">
         <createTable tableName="Lesson">
-            <column name="id" type="int">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="teacherId" type="int">
@@ -173,7 +173,7 @@
 
     <changeSet id="create Replenishment table" author="ryazhapov">
         <createTable tableName="Replenishment">
-            <column name="id" type="int">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="studentId" type="int">
@@ -194,7 +194,7 @@
 
     <changeSet id="create Withdrawal table" author="ryazhapov">
         <createTable tableName="Withdrawal">
-            <column name="id" type="int">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="teacherId" type="int">
@@ -215,7 +215,7 @@
 
     <changeSet id="create Payment table" author="ryazhapov">
         <createTable tableName="Payment">
-            <column name="id" type="int">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="studentId" type="int">

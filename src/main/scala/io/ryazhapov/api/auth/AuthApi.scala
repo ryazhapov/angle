@@ -58,7 +58,7 @@ class AuthApi[R <: Api.DefaultApiEnv] extends Api[R] {
       )
   }
   val authedRoutes: AuthedRoutes[UserWithSession, ApiTask] = AuthedRoutes.of[UserWithSession, ApiTask] {
-    case GET -> Root / "users" as UserWithSession(user, session) =>
+    case GET -> Root / "user" / "all" as UserWithSession(user, session) =>
       user.role match {
         case AdminRole => log.info("Get all users") *>
           UserService.getAllUsers.foldM(

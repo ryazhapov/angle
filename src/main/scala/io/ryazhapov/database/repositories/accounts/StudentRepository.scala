@@ -32,32 +32,32 @@ object StudentRepository extends Repository {
 
   class PostgresStudentRepository(xa: Transactor[Task]) extends Service {
 
-    lazy val StudentTable = quote(querySchema[Student](""""Student""""))
+    lazy val studentTable = quote(querySchema[Student](""""Student""""))
 
     override def create(student: Student): Task[Unit] =
       dbContext.run {
-        StudentTable
+        studentTable
           .insert(lift(student))
       }.unit.transact(xa)
 
     override def update(student: Student): Task[Unit] =
       dbContext.run {
-        StudentTable
+        studentTable
           .update(lift(student))
       }.unit.transact(xa)
 
     override def get(id: UserId): Task[Option[Student]] =
       dbContext.run {
-        StudentTable
+        studentTable
           .filter(_.userId == lift(id))
       }.map(_.headOption).transact(xa)
 
     override def getAll: Task[List[Student]] =
-      dbContext.run(StudentTable).transact(xa)
+      dbContext.run(studentTable).transact(xa)
 
     override def delete(id: UserId): Task[Unit] =
       dbContext.run {
-        StudentTable
+        studentTable
           .filter(_.userId == lift(id))
           .delete
       }.unit.transact(xa)

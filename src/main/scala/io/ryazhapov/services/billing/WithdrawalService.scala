@@ -36,10 +36,10 @@ object WithdrawalService {
       for {
         teacherOpt <- teacherRepository.get(id)
         teacher <- ZIO.fromEither(teacherOpt.toRight(TeacherNotFound))
-        _ <- ZIO.when(teacher.balance >= request.amount)(ZIO.fail(NotEnoughMoney))
+        _ <- ZIO.when(teacher.balance < request.amount)(ZIO.fail(NotEnoughMoney))
         updTeacher = teacher.copy(balance = teacher.balance - request.amount)
-        _ <- teacherRepository.update(updTeacher)
-        _ <- withdrawalRepository.create(Withdrawal(0, id, request.amount))
+        newWithdrawal = Withdrawal(0, id, request.amount)
+        _ <- withdrawalRepository.create(updTeacher, newWithdrawal)
       } yield ()
 
     override def getAllWithdrawals: Task[List[Withdrawal]] =

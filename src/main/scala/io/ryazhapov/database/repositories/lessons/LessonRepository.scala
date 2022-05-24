@@ -6,6 +6,7 @@ import io.ryazhapov.database.repositories.Repository
 import io.ryazhapov.database.services.TransactorService.DBTransactor
 import io.ryazhapov.domain.LessonId
 import io.ryazhapov.domain.accounts.Role.TeacherRole
+import io.ryazhapov.domain.accounts.Student
 import io.ryazhapov.domain.auth.User
 import io.ryazhapov.domain.lessons.Lesson
 import zio.interop.catz._
@@ -21,7 +22,7 @@ object LessonRepository extends Repository {
     ZLayer.fromService(new PostgresLessonRepository(_))
 
   trait Service {
-    def create(lesson: Lesson): Task[LessonId]
+    def create(student: Student, lesson: Lesson): Task[LessonId]
 
     def update(lesson: Lesson): Task[Unit]
 
@@ -37,18 +38,34 @@ object LessonRepository extends Repository {
 
     def findUnion(lesson: Lesson): Task[List[Lesson]]
 
-    def delete(id: LessonId): Task[Unit]
+    def delete(student: Student, id: LessonId): Task[Unit]
   }
 
   class PostgresLessonRepository(xa: Transactor[Task]) extends Service {
     lazy val lessonTable = quote(querySchema[Lesson](""""Lesson""""))
+    lazy val studentTable = quote(querySchema[Student](""""Student""""))
 
-    override def create(lesson: Lesson): Task[LessonId] =
-      dbContext.run {
+    override def create(student: Student, lesson: Lesson): Task[LessonId] = {
+
+      val updateStudent = dbContext.run {
+        studentTable
+          .filter(_.userId == lift(student.userId))
+          .update(lift(student))
+      }.unit
+
+      val createLesson = dbContext.run {
         lessonTable
           .insert(lift(lesson))
           .returningGenerated(_.id)
-      }.transact(xa)
+      }
+
+      val transaction = for {
+        _ <- updateStudent
+        lessonId <- createLesson
+      } yield lessonId
+
+      transaction.transact(xa)
+    }
 
     override def update(lesson: Lesson): Task[Unit] =
       dbContext.run {
@@ -115,11 +132,26 @@ object LessonRepository extends Repository {
           )
       }.transact(xa)
 
-    override def delete(id: LessonId): Task[Unit] =
-      dbContext.run {
+    override def delete(student: Student, id: LessonId): Task[Unit] = {
+
+      val updateStudent = dbContext.run {
+        studentTable
+          .filter(_.userId == lift(student.userId))
+          .update(lift(student))
+      }.unit
+
+      val deleteLesson = dbContext.run {
         lessonTable
           .filter(_.id == lift(id))
           .delete
-      }.unit.transact(xa)
+      }.unit
+
+      val transaction = for {
+        _ <- updateStudent
+        _ <- deleteLesson
+      } yield ()
+
+      transaction.transact(xa)
+    }
   }
 }

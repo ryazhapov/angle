@@ -44,7 +44,7 @@ class StudentApi[R <: Api.DefaultApiEnv with StudentService] extends Api[R] {
         result => okWithCookie(result, session.id)
       )
 
-    case GET -> Root as UserWithSession(_, session) =>
+    case GET -> Root / "all" as UserWithSession(_, session) =>
       val handleRequest = for {
         _ <- log.info(s"Getting all students")
         result <- StudentService.getAllStudents

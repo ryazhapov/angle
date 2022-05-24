@@ -32,7 +32,7 @@ object ScheduleService {
 
     def findScheduleForLesson(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): Task[List[Schedule]]
 
-    def deleteSchedule(id: ScheduleId): Task[Unit]
+    def deleteSchedule(id: UserId, scheduleId: ScheduleId): Task[Unit]
   }
 
   class ServiceImpl(
@@ -41,7 +41,7 @@ object ScheduleService {
 
     override def createSchedule(id: UserId, request: ScheduleRequest): Task[ScheduleId] = {
       for {
-        _ <- ZIO.when(request.isValid)(ZIO.fail(InvalidScheduleTime))
+        _ <- ZIO.when(!request.isValid)(ZIO.fail(InvalidScheduleTime))
         schedules <- scheduleRepository.findUnion(id, request.startsAt, request.endsAt)
         _ <- schedules match {
           case ::(_, _) => ZIO.fail(ScheduleOverlapping)
@@ -53,10 +53,10 @@ object ScheduleService {
 
     override def updateSchedule(id: UserId, scheduleId: ScheduleId, request: ScheduleRequest): Task[Unit] =
       for {
-        _ <- ZIO.when(request.isValid)(ZIO.fail(InvalidScheduleTime))
+        _ <- ZIO.when(!request.isValid)(ZIO.fail(InvalidScheduleTime))
         scheduleOpt <- scheduleRepository.get(scheduleId)
         schedule <- ZIO.fromEither(scheduleOpt.toRight(ScheduleNotFound))
-        _ <- ZIO.when(id == schedule.teacherId)(ZIO.fail(UnauthorizedAction))
+        _ <- ZIO.when(id != schedule.teacherId)(ZIO.fail(UnauthorizedAction))
         schedules <- scheduleRepository.findUnion(id, request.startsAt, request.endsAt)
         _ <- schedules match {
           case ::(_, _) => ZIO.fail(ScheduleOverlapping)
@@ -86,7 +86,13 @@ object ScheduleService {
     override def findScheduleForLesson(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): Task[List[Schedule]] =
       scheduleRepository.findIntersection(lessonStart, lessonEnd)
 
-    override def deleteSchedule(id: ScheduleId): Task[Unit] =
-      scheduleRepository.delete(id)
+    override def deleteSchedule(id: UserId, scheduleId: ScheduleId): Task[Unit] = {
+      for {
+        scheduleOpt <- scheduleRepository.get(scheduleId)
+        schedule <- ZIO.fromEither(scheduleOpt.toRight(ScheduleNotFound))
+        _ <- ZIO.when(id != schedule.teacherId)(ZIO.fail(UnauthorizedAction))
+        _ <- scheduleRepository.delete(scheduleId)
+      } yield ()
+    }
   }
 }

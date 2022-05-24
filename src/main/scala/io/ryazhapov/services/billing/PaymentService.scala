@@ -3,6 +3,8 @@ package io.ryazhapov.services.billing
 import io.ryazhapov.database.repositories.accounts.{StudentRepository, TeacherRepository}
 import io.ryazhapov.database.repositories.billing.PaymentRepository
 import io.ryazhapov.database.repositories.lessons.LessonRepository
+import io.ryazhapov.domain.accounts.Role
+import io.ryazhapov.domain.auth.User
 import io.ryazhapov.domain.billing.Payment
 import io.ryazhapov.domain.{LessonId, PaymentId, UserId}
 import io.ryazhapov.errors._
@@ -28,11 +30,11 @@ object PaymentService {
 
     def getPayment(id: PaymentId): Task[Payment]
 
-    def getAllPayments: Task[List[Payment]]
+    def getAllPayments(user: User): Task[List[Payment]]
 
-    def getPaymentByStudent(studentId: UserId): Task[List[Payment]]
-
-    def getPaymentByTeacher(teacherId: UserId): Task[List[Payment]]
+//    def getPaymentByStudent(studentId: UserId): Task[List[Payment]]
+//
+//    def getPaymentByTeacher(teacherId: UserId): Task[List[Payment]]
 
     def getPaymentByLesson(lessonId: LessonId): Task[Payment]
   }
@@ -48,18 +50,21 @@ object PaymentService {
       for {
         lessonOpt <- lessonRepository.get(lessonId)
         lesson <- ZIO.fromEither(lessonOpt.toRight(LessonNotFound))
-        _ <- ZIO.when(id == lesson.teacherId)(ZIO.fail(UnauthorizedAction))
+        paymentOpt <- paymentRepository.getByLesson(lesson.id)
+        _ <- paymentOpt match {
+          case Some(_) => ZIO.fail(LessonAlreadyPaid)
+          case None        => ZIO.succeed(())
+        }
+        _ <- ZIO.when(id != lesson.teacherId)(ZIO.fail(UnauthorizedAction))
         studentOpt <- studentRepository.get(lesson.studentId)
         student <- ZIO.fromEither(studentOpt.toRight(StudentNotFound))
         teacherOpt <- teacherRepository.get(id)
         teacher <- ZIO.fromEither(teacherOpt.toRight(TeacherNotFound))
-        updStudent = student.copy(balance = student.reserved - teacher.rate)
+        updStudent = student.copy(reserved = student.reserved - teacher.rate)
         updTeacher = teacher.copy(balance = teacher.balance + teacher.rate)
         updLesson = lesson.copy(completed = true)
-        _ <- studentRepository.update(updStudent)
-        _ <- teacherRepository.update(updTeacher)
-        _ <- lessonRepository.update(updLesson)
-        paymentId <- paymentRepository.create(Payment(0, student.userId, id, lessonId, teacher.rate))
+        newPayment = Payment(0, student.userId, id, lessonId, teacher.rate)
+        paymentId <- paymentRepository.create(updStudent, updTeacher, updLesson, newPayment)
       } yield paymentId
 
     override def getPayment(id: PaymentId): Task[Payment] =
@@ -68,14 +73,19 @@ object PaymentService {
         payment <- ZIO.fromEither(paymentOpt.toRight(PaymentNotFound))
       } yield payment
 
-    override def getAllPayments: Task[List[Payment]] =
-      paymentRepository.getAll
+    override def getAllPayments(user: User): Task[List[Payment]] = {
+      user.role match {
+        case Role.AdminRole   => paymentRepository.getAll
+        case Role.StudentRole => paymentRepository.getByStudent(user.id)
+        case Role.TeacherRole => paymentRepository.getByTeacher(user.id)
+      }
+    }
 
-    override def getPaymentByStudent(studentId: UserId): Task[List[Payment]] =
-      paymentRepository.getByStudent(studentId)
-
-    override def getPaymentByTeacher(teacherId: UserId): Task[List[Payment]] =
-      paymentRepository.getByTeacher(teacherId)
+//    override def getPaymentByStudent(studentId: UserId): Task[List[Payment]] =
+//      paymentRepository.getByStudent(studentId)
+//
+//    override def getPaymentByTeacher(teacherId: UserId): Task[List[Payment]] =
+//      paymentRepository.getByTeacher(teacherId)
 
     override def getPaymentByLesson(lessonId: LessonId): Task[Payment] =
       for {

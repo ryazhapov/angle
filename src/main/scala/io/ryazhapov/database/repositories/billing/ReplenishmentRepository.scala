@@ -4,8 +4,10 @@ import doobie.implicits._
 import doobie.util.transactor.Transactor
 import io.ryazhapov.database.repositories.Repository
 import io.ryazhapov.database.services.TransactorService.DBTransactor
-import io.ryazhapov.domain.{ReplenishmentId, UserId}
+import io.ryazhapov.domain.accounts.Student
+import io.ryazhapov.domain.auth.User
 import io.ryazhapov.domain.billing.Replenishment
+import io.ryazhapov.domain.{ReplenishmentId, UserId}
 import zio.interop.catz._
 import zio.{Has, Task, URLayer, ZLayer}
 
@@ -19,7 +21,7 @@ object ReplenishmentRepository extends Repository {
     ZLayer.fromService(new PostgresReplenishmentRepository(_))
 
   trait Service {
-    def create(replenishment: Replenishment): Task[ReplenishmentId]
+    def create(user: User, student: Student, replenishment: Replenishment): Task[ReplenishmentId]
 
     def getAll: Task[List[Replenishment]]
 
@@ -29,13 +31,37 @@ object ReplenishmentRepository extends Repository {
   class PostgresReplenishmentRepository(xa: Transactor[Task]) extends Service {
 
     lazy val replenishmentTable = quote(querySchema[Replenishment](""""Replenishment""""))
+    lazy val studentTable = quote(querySchema[Student](""""Student""""))
+    lazy val userTable = quote(querySchema[User](""""User""""))
 
-    override def create(replenishment: Replenishment): Task[ReplenishmentId] =
-      dbContext.run {
+    override def create(user: User, student: Student, replenishment: Replenishment): Task[ReplenishmentId] = {
+
+      val updateUser = dbContext.run {
+        userTable
+          .filter(_.id == lift(user.id))
+          .update(lift(user))
+      }.unit
+
+      val updateStudent = dbContext.run {
+        studentTable
+          .filter(_.userId == lift(student.userId))
+          .update(lift(student))
+      }.unit
+
+      val createReplenishment = dbContext.run {
         replenishmentTable
           .insert(lift(replenishment))
           .returningGenerated(_.id)
-      }.transact(xa)
+      }
+
+      val transaction = for {
+        _ <- updateUser
+        _ <- updateStudent
+        replenishmentId <- createReplenishment
+      } yield replenishmentId
+
+      transaction.transact(xa)
+    }
 
     override def getAll: Task[List[Replenishment]] =
       dbContext.run(replenishmentTable).transact(xa)

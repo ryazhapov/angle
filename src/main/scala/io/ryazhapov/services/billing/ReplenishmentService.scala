@@ -44,9 +44,8 @@ object ReplenishmentService {
         user <- ZIO.fromEither(userOpt.toRight(UserNotFound))
         updStudent = student.copy(balance = student.balance + request.amount)
         updUser = user.copy(verified = true)
-        _ <- userRepository.update(updUser)
-        _ <- studentRepository.update(updStudent)
-        _ <- replenishmentRepository.create(Replenishment(0, id, request.amount))
+        newReplenishment = Replenishment(0, id, request.amount)
+        _ <- replenishmentRepository.create(updUser, updStudent, newReplenishment)
       } yield ()
 
     override def getAllReplenishments: Task[List[Replenishment]] =
