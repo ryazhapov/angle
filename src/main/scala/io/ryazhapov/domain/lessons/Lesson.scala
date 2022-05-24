@@ -10,6 +10,7 @@ case class Lesson(
   studentId: UserId,
   startsAt: ZonedDateTime,
   endsAt: ZonedDateTime,
+  link: String,
   completed: Boolean
 ) {
   def isValid: Boolean =

@@ -20,3 +20,14 @@
 - **docker** — Container
 - **zio-test** — Tests // TODO
 - **tapir** — Api documentation // TODO
+
+## Запуск
+
+`docker-compose up -d
+`
+
+`sbt compile
+`
+
+`sbt run
+`

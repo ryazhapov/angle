@@ -9,6 +9,8 @@ import io.ryazhapov.errors._
 import zio.macros.accessible
 import zio.{Has, Task, ZIO, ZLayer}
 
+import java.util.UUID
+
 @accessible
 object LessonService {
 
@@ -58,12 +60,15 @@ object LessonService {
           case ::(_, _) => ZIO.succeed(())
           case Nil      => ZIO.fail(ScheduleNotFound)
         }
+        randomUUID <- ZIO.effect(UUID.randomUUID())
+        link = "https://zoom.us/j/" + randomUUID.toString
         lesson = Lesson(
           0,
           teacher.userId,
           id,
           request.startsAt,
           lessonEnd,
+          link,
           completed = false
         )
         schedules <- lessonRepository.findUnion(lesson)

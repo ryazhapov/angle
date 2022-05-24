@@ -141,6 +141,9 @@
             <column name="endsAt" type="timestamp with time zone">
                 <constraints nullable="false"/>
             </column>
+            <column name="link" type="varchar">
+                <constraints nullable="false"/>
+            </column>
             <column name="completed" type="boolean">
                 <constraints nullable="false"/>
             </column>
