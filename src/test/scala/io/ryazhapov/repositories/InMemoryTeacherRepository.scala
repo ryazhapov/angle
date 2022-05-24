@@ -1,36 +1,33 @@
-package io.ryazhapov.InMemoryRepositories
+package io.ryazhapov.repositories
 
+import io.ryazhapov.repositories.maps.teacherMap
 import io.ryazhapov.database.repositories.accounts.TeacherRepository
 import io.ryazhapov.database.repositories.accounts.TeacherRepository.TeacherRepository
 import io.ryazhapov.domain.UserId
 import io.ryazhapov.domain.accounts.Teacher
 import zio.{Task, ZLayer}
 
-import scala.collection.concurrent.TrieMap
-
 class InMemoryTeacherRepository extends TeacherRepository.Service() {
 
-  private val map = new TrieMap[Int, Teacher]()
-
   override def create(teacher: Teacher): Task[Unit] = Task.succeed {
-    map.put(teacher.userId, teacher)
+    teacherMap.put(teacher.userId, teacher)
     teacher.userId
   }
 
   override def update(teacher: Teacher): Task[Unit] = Task.succeed {
-    map.update(teacher.userId, teacher)
+    teacherMap.update(teacher.userId, teacher)
   }
 
   override def get(id: UserId): Task[Option[Teacher]] = Task.succeed {
-    map.get(id)
+    teacherMap.get(id)
   }
 
   override def getAll: Task[List[Teacher]] = Task.succeed {
-    map.values.toList
+    teacherMap.values.toList
   }
 
   override def delete(id: UserId): Task[Unit] = Task.succeed {
-    map.remove(id)
+    teacherMap.remove(id)
   }
 }
 

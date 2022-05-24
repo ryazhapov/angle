@@ -1,58 +1,55 @@
-package io.ryazhapov.InMemoryRepositories
+package io.ryazhapov.repositories
 
+import io.ryazhapov.repositories.maps.userMap
 import io.ryazhapov.database.repositories.auth.UserRepository
 import io.ryazhapov.database.repositories.auth.UserRepository.UserRepository
 import io.ryazhapov.domain.UserId
 import io.ryazhapov.domain.auth.User
 import zio.{Task, ZLayer}
 
-import scala.collection.concurrent.TrieMap
-
 class InMemoryUserRepository extends UserRepository.Service {
 
-  private val map = new TrieMap[Int, User]()
-
   override def create(user: User): Task[UserId] = Task.succeed {
-    map.put(user.id, user)
+    userMap.put(user.id, user)
     user.id
   }
 
   override def update(user: User): Task[Unit] = Task.succeed {
-    map.update(user.id, user)
+    userMap.update(user.id, user)
   }
 
   override def get(id: UserId): Task[Option[User]] = Task.succeed {
-    map.get(id)
+    userMap.get(id)
   }
 
   override def verify(id: UserId): Task[Unit] = Task.succeed {
-    val user = map.get(id)
+    val user = userMap.get(id)
     user match {
-      case Some(value) => map.update(id, value.copy(verified = true))
+      case Some(value) => userMap.update(id, value.copy(verified = true))
       case None        => ()
     }
   }
 
   override def getAll: Task[List[User]] = Task.succeed {
-    map.values.toList
+    userMap.values.toList
   }
 
   override def getUnverified: Task[List[User]] = Task.succeed {
-    map.values.filter(_.verified == false).toList
+    userMap.values.filter(_.verified == false).toList
   }
 
   override def getByEmail(email: String): Task[Option[User]] = Task.succeed {
-    map.values.find(_.email == email)
+    userMap.values.find(_.email == email)
   }
 
   override def delete(id: UserId): Task[Unit] = Task.succeed {
-    map.remove(id)
+    userMap.remove(id)
   }
 
   override def deleteByEmail(email: String): Task[Unit] = Task.succeed {
-    val user = map.find(_._2.email == email)
+    val user = userMap.find(_._2.email == email)
     user match {
-      case Some(value) => map.remove(value._1)
+      case Some(value) => userMap.remove(value._1)
       case None        => ()
     }
   }

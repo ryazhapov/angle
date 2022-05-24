@@ -4,7 +4,7 @@ import io.circe.generic.auto._
 import io.ryazhapov.api.Api
 import io.ryazhapov.domain.accounts.Role.TeacherRole
 import io.ryazhapov.domain.auth.UserWithSession
-import io.ryazhapov.domain.lessons.ScheduleRequest
+import io.ryazhapov.domain.lessons.{FindLessonRequest, ScheduleRequest}
 import io.ryazhapov.services.lessons.ScheduleService
 import io.ryazhapov.services.lessons.ScheduleService.ScheduleService
 import org.http4s.{AuthedRoutes, HttpRoutes, Response}
@@ -51,6 +51,17 @@ class ScheduleApi[R <: Api.DefaultApiEnv with ScheduleService] extends Api[R] {
 
         case _ => IO(Response(Unauthorized))
       }
+
+    case authReq @ POST -> Root / "find" as UserWithSession(user, session) =>
+      val handleRequest = for {
+        lessonReq <- authReq.req.as[FindLessonRequest]
+        _ <- log.info(s"Finding schedule for lesson (starts at ${lessonReq.startsAt})")
+        result <- ScheduleService.findScheduleForLesson(lessonReq)
+      } yield result
+      handleRequest.foldM(
+        throwableToHttpCode,
+        result => okWithCookie(result, session.id)
+      )
 
     case GET -> Root / IntVar(id) as UserWithSession(_, session) =>
       val handleRequest = for {

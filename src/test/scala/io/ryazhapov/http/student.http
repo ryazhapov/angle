@@ -1,0 +1,42 @@
+### student sign up
+
+POST http://localhost:8080/api/v1/auth/sign_up
+Content-Type: application/json
+
+{
+  "email": "student100@gmail.com",
+  "password": "qwerty",
+  "role": "student"
+}
+
+
+> {% client.global.set("cookie", response.headers.valueOf('Set-Cookie')); %}
+
+### student check session
+
+GET http://localhost:8080/api/v1/auth/check_session
+Accept: application/json
+Cookie: {{cookie}}
+
+### student sign out
+
+DELETE http://localhost:8080/api/v1/auth/sign_out
+Accept: application/json
+Cookie: {{cookie}}
+
+### student sign in
+
+POST http://localhost:8080/api/v1/auth/sign_in
+Content-Type: application/json
+
+{
+  "email": "student100@gmail.com",
+  "password": "qwerty"
+}
+> {% client.global.set("cookie", response.headers.valueOf('Set-Cookie')); %}
+
+### student cant see all users
+
+GET http://localhost:8080/api/v1/auth/user/all
+Accept: application/json
+Cookie: {{cookie}}

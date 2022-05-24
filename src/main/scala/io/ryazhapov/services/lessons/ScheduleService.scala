@@ -1,7 +1,7 @@
 package io.ryazhapov.services.lessons
 
 import io.ryazhapov.database.repositories.lessons.ScheduleRepository
-import io.ryazhapov.domain.lessons.{Schedule, ScheduleRequest}
+import io.ryazhapov.domain.lessons.{FindLessonRequest, Schedule, ScheduleRequest}
 import io.ryazhapov.domain.{ScheduleId, UserId}
 import io.ryazhapov.errors.{InvalidScheduleTime, ScheduleNotFound, ScheduleOverlapping, UnauthorizedAction}
 import zio.macros.accessible
@@ -30,7 +30,7 @@ object ScheduleService {
 
     def getScheduleByTeacherId(teacherId: UserId): Task[List[Schedule]]
 
-    def findScheduleForLesson(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): Task[List[Schedule]]
+    def findScheduleForLesson(request: FindLessonRequest): Task[List[Schedule]]
 
     def deleteSchedule(id: UserId, scheduleId: ScheduleId): Task[Unit]
   }
@@ -83,8 +83,8 @@ object ScheduleService {
     override def getScheduleByTeacherId(teacherId: UserId): Task[List[Schedule]] =
       scheduleRepository.getByTeacher(teacherId)
 
-    override def findScheduleForLesson(lessonStart: ZonedDateTime, lessonEnd: ZonedDateTime): Task[List[Schedule]] =
-      scheduleRepository.findIntersection(lessonStart, lessonEnd)
+    override def findScheduleForLesson(request: FindLessonRequest): Task[List[Schedule]] =
+      scheduleRepository.findIntersection(request.startsAt, request.startsAt.plusHours(1))
 
     override def deleteSchedule(id: UserId, scheduleId: ScheduleId): Task[Unit] = {
       for {

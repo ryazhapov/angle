@@ -87,6 +87,4 @@ trait Api[R <: DefaultApiEnv] extends ErrorMapping[R] {
   object LessonIdParamMatcher extends QueryParamDecoderMatcher[Int]("lesson")
 
   object ScheduleIdParamMatcher extends QueryParamDecoderMatcher[Int]("schedule")
-
-  object CompletedParamMatcher extends QueryParamDecoderMatcher[Boolean]("completed")
 }

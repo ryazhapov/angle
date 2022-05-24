@@ -1,0 +1,3203 @@
+{
+	"info": {
+		"_postman_id": "07e663a5-64ac-4c47-9008-b91349b3af25",
+		"name": "angle API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19173674"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Sign up request as a student",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"student@gmail.com\",\r\n    \"password\": \"qwerty\",\r\n    \"role\": \"student\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/sign_up",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"sign_up"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Sign up request as a student",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"student@gmail.com\",\r\n    \"password\": \"qwerty\",\r\n    \"role\": \"student\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/auth/sign_up",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"sign_up"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=1; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 15:07:21 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1"
+								}
+							],
+							"cookie": [],
+							"body": "1"
+						}
+					]
+				},
+				{
+					"name": "Sign up request as a teacher",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"teacher2@gmail.com\",\r\n    \"password\": \"qwerty\",\r\n    \"role\": \"teacher\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/sign_up",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"sign_up"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Sign up request as a teacher",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"teacher@gmail.com\",\r\n    \"password\": \"qwerty\",\r\n    \"role\": \"teacher\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/auth/sign_up",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"sign_up"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=2; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 15:07:34 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1"
+								}
+							],
+							"cookie": [],
+							"body": "2"
+						}
+					]
+				},
+				{
+					"name": "Sign up request as an admin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"admin@gmail.com\",\r\n    \"password\": \"qwerty\",\r\n    \"role\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/sign_up",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"sign_up"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Sign up request as an admin",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"admin@gmail.com\",\r\n    \"password\": \"qwerty\",\r\n    \"role\": \"admin\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/auth/sign_up",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"sign_up"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=3; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 15:07:42 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1"
+								}
+							],
+							"cookie": [],
+							"body": "3"
+						}
+					]
+				},
+				{
+					"name": "Sign in request (student)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"student@gmail.com\",\r\n    \"password\": \"qwerty\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/sign_in",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"sign_in"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Sign in request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"student@gmail.com\",\r\n    \"password\": \"qwerty\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/auth/sign_in",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"sign_in"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=4; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 15:08:03 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1"
+								}
+							],
+							"cookie": [],
+							"body": "1"
+						}
+					]
+				},
+				{
+					"name": "Sign in request (admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"admin@gmail.com\",\r\n    \"password\": \"qwerty\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/sign_in",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"sign_in"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Sign in request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"student@gmail.com\",\r\n    \"password\": \"qwerty\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/auth/sign_in",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"sign_in"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=4; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 15:08:03 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1"
+								}
+							],
+							"cookie": [],
+							"body": "1"
+						}
+					]
+				},
+				{
+					"name": "Sign in request (teacher)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"teacher2@gmail.com\",\r\n    \"password\": \"qwerty\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/sign_in",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"sign_in"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Sign in request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"student@gmail.com\",\r\n    \"password\": \"qwerty\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/auth/sign_in",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"sign_in"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=4; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 15:08:03 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1"
+								}
+							],
+							"cookie": [],
+							"body": "1"
+						}
+					]
+				},
+				{
+					"name": "Sign in request (non existing user)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"person@gmail.com\",\r\n    \"password\": \"qwerty\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/sign_in",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"sign_in"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Sign in request (non existing user)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"person@gmail.com\",\r\n    \"password\": \"qwerty\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/auth/sign_in",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"sign_in"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 15:08:45 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "48"
+								}
+							],
+							"cookie": [],
+							"body": "\"User with name=person@gmail.com does not exist\""
+						}
+					]
+				},
+				{
+					"name": "Check session request",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/check_session",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"check_session"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Check session request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "localhost:8080/api/v1/auth/check_session",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"check_session"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=4; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 15:09:10 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1"
+								}
+							],
+							"cookie": [],
+							"body": "1"
+						}
+					]
+				},
+				{
+					"name": "Check session request (with no cookies)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/check_session",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"check_session"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Check session request Copy",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/auth/check_session",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"check_session"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 15:09:46 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "26"
+								}
+							],
+							"cookie": [],
+							"body": "\"Session cookie is absent\""
+						}
+					]
+				},
+				{
+					"name": "Get all users (as admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/user/all",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"user",
+								"all"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get all users (as admin)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "localhost:8080/api/v1/auth/user/all",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"user",
+										"all"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=6; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 03:25:52 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "837"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"email\": \"student@gmail.com\",\n        \"role\": \"student\",\n        \"verified\": false,\n        \"passwordHash\": \"2b956c2ce243db9a8897ee40e4be28ecf65909541e18126d29458a79bde0df73\",\n        \"salt\": [\n            -59,\n            88,\n            28,\n            122,\n            88,\n            -8,\n            -91,\n            -87,\n            -126,\n            26,\n            104,\n            116,\n            -55,\n            -16,\n            39,\n            -77,\n            39,\n            92,\n            -31,\n            -66,\n            72,\n            -62,\n            -14,\n            119,\n            -104,\n            -64,\n            -39,\n            4,\n            -92,\n            47,\n            -31,\n            -109\n        ]\n    },\n    {\n        \"id\": 2,\n        \"email\": \"teacher@gmail.com\",\n        \"role\": \"teacher\",\n        \"verified\": false,\n        \"passwordHash\": \"228f27f55818139917ca9855dcfbdd9a3d3b5b05adca77414df57a2139fb3546\",\n        \"salt\": [\n            113,\n            84,\n            29,\n            -45,\n            -18,\n            88,\n            -124,\n            -102,\n            88,\n            -114,\n            -126,\n            113,\n            -41,\n            51,\n            -115,\n            20,\n            -14,\n            -76,\n            30,\n            92,\n            -32,\n            87,\n            -56,\n            102,\n            21,\n            -37,\n            63,\n            -118,\n            15,\n            117,\n            6,\n            -11\n        ]\n    },\n    {\n        \"id\": 3,\n        \"email\": \"admin@gmail.com\",\n        \"role\": \"admin\",\n        \"verified\": true,\n        \"passwordHash\": \"9d208f9d13a51e3b9827ffb622167fbd56b0614832b1b3fc096f8af032e71b70\",\n        \"salt\": [\n            110,\n            -113,\n            -71,\n            -58,\n            -44,\n            87,\n            0,\n            84,\n            -34,\n            -34,\n            22,\n            -15,\n            26,\n            38,\n            115,\n            15,\n            -66,\n            36,\n            117,\n            -28,\n            43,\n            -110,\n            65,\n            -69,\n            102,\n            32,\n            22,\n            32,\n            88,\n            -125,\n            -76,\n            -30\n        ]\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get all users (as student)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/user/all",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"user",
+								"all"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get all users (as student)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "localhost:8080/api/v1/auth/user/all",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"user",
+										"all"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=6; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 03:25:21 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "837"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"email\": \"student@gmail.com\",\n        \"role\": \"student\",\n        \"verified\": false,\n        \"passwordHash\": \"2b956c2ce243db9a8897ee40e4be28ecf65909541e18126d29458a79bde0df73\",\n        \"salt\": [\n            -59,\n            88,\n            28,\n            122,\n            88,\n            -8,\n            -91,\n            -87,\n            -126,\n            26,\n            104,\n            116,\n            -55,\n            -16,\n            39,\n            -77,\n            39,\n            92,\n            -31,\n            -66,\n            72,\n            -62,\n            -14,\n            119,\n            -104,\n            -64,\n            -39,\n            4,\n            -92,\n            47,\n            -31,\n            -109\n        ]\n    },\n    {\n        \"id\": 2,\n        \"email\": \"teacher@gmail.com\",\n        \"role\": \"teacher\",\n        \"verified\": false,\n        \"passwordHash\": \"228f27f55818139917ca9855dcfbdd9a3d3b5b05adca77414df57a2139fb3546\",\n        \"salt\": [\n            113,\n            84,\n            29,\n            -45,\n            -18,\n            88,\n            -124,\n            -102,\n            88,\n            -114,\n            -126,\n            113,\n            -41,\n            51,\n            -115,\n            20,\n            -14,\n            -76,\n            30,\n            92,\n            -32,\n            87,\n            -56,\n            102,\n            21,\n            -37,\n            63,\n            -118,\n            15,\n            117,\n            6,\n            -11\n        ]\n    },\n    {\n        \"id\": 3,\n        \"email\": \"admin@gmail.com\",\n        \"role\": \"admin\",\n        \"verified\": true,\n        \"passwordHash\": \"9d208f9d13a51e3b9827ffb622167fbd56b0614832b1b3fc096f8af032e71b70\",\n        \"salt\": [\n            110,\n            -113,\n            -71,\n            -58,\n            -44,\n            87,\n            0,\n            84,\n            -34,\n            -34,\n            22,\n            -15,\n            26,\n            38,\n            115,\n            15,\n            -66,\n            36,\n            117,\n            -28,\n            43,\n            -110,\n            65,\n            -69,\n            102,\n            32,\n            22,\n            32,\n            88,\n            -125,\n            -76,\n            -30\n        ]\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get user with id (as admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/user/3",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"user",
+								"3"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get user with id (as admin)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "localhost:8080/api/v1/auth/user/3",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"user",
+										"3"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=6; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 15:12:10 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "272"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 3,\n    \"email\": \"admin@gmail.com\",\n    \"role\": \"admin\",\n    \"verified\": true,\n    \"passwordHash\": \"9d208f9d13a51e3b9827ffb622167fbd56b0614832b1b3fc096f8af032e71b70\",\n    \"salt\": [\n        110,\n        -113,\n        -71,\n        -58,\n        -44,\n        87,\n        0,\n        84,\n        -34,\n        -34,\n        22,\n        -15,\n        26,\n        38,\n        115,\n        15,\n        -66,\n        36,\n        117,\n        -28,\n        43,\n        -110,\n        65,\n        -69,\n        102,\n        32,\n        22,\n        32,\n        88,\n        -125,\n        -76,\n        -30\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Sign out request",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "localhost:8080/api/v1/auth/sign_out",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"sign_out"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Sign out request",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "localhost:8080/api/v1/auth/sign_out",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"auth",
+										"sign_out"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 May 2022 14:38:51 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2"
+								}
+							],
+							"cookie": [],
+							"body": "{}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Teacher",
+			"item": [
+				{
+					"name": "Get all teachers",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/teacher/all",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"teacher",
+								"all"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "localhost:8080/api/teacher/",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"userId\": \"c26b5ad3-a656-4290-9ad3-af7cc0805371\",\r\n    \"level\": \"advanced\",\r\n    \"isNative\": true,\r\n    \"balance\": 1000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/teacher/all",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"teacher",
+										"all"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=6; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 03:33:20 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "81"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"userId\": 2,\n        \"level\": \"upper_intermediate\",\n        \"native\": false,\n        \"rate\": 500,\n        \"balance\": 0\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get teacher with id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/teacher/2",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"teacher",
+								"2"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get teacher with id",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"userId\": \"c26b5ad3-a656-4290-9ad3-af7cc0805371\",\r\n    \"level\": \"advanced\",\r\n    \"isNative\": true,\r\n    \"balance\": 1000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/teacher/2",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"teacher",
+										"2"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=6; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 03:34:15 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "79"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"userId\": 2,\n    \"level\": \"upper_intermediate\",\n    \"native\": false,\n    \"rate\": 500,\n    \"balance\": 0\n}"
+						}
+					]
+				},
+				{
+					"name": "Update teacher (as teacher)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"rate\": \"1000\"\r\n}"
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/teacher/update/2",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"teacher",
+								"update",
+								"2"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Update teacher (as teacher)",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"rate\": \"1000\"\r\n}"
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/teacher/update/2",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"teacher",
+										"update",
+										"2"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=14; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 03:43:55 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2"
+								}
+							],
+							"cookie": [],
+							"body": "{}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Student",
+			"item": [
+				{
+					"name": "Get all students",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/student/all",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"student",
+								"all"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get all students",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/student/all",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"student",
+										"all"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=14; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 03:58:01 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "88"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"userId\": 1,\n        \"level\": \"beginner\",\n        \"target\": \"upper_intermediate\",\n        \"balance\": 0,\n        \"reserved\": 0\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get student with id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/student/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"student",
+								"1"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get student with id",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/student/1",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"student",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=14; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 03:58:18 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "86"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"userId\": 1,\n    \"level\": \"beginner\",\n    \"target\": \"upper_intermediate\",\n    \"balance\": 0,\n    \"reserved\": 0\n}"
+						}
+					]
+				},
+				{
+					"name": "Update student (as student)",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"target\": \"advanced\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/student/update/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"student",
+								"update",
+								"1"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Update teacher (as teacher)",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"target\": \"advanced\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/student/update/1",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"student",
+										"update",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=18; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 04:01:55 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2"
+								}
+							],
+							"cookie": [],
+							"body": "{}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Get unverified users (as admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/admin/verify/show",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"verify",
+								"show"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "New Request",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/admin/verify/show",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"verify",
+										"show"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=13; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 03:39:42 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "564"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"email\": \"student@gmail.com\",\n        \"role\": \"student\",\n        \"verified\": false,\n        \"passwordHash\": \"2b956c2ce243db9a8897ee40e4be28ecf65909541e18126d29458a79bde0df73\",\n        \"salt\": [\n            -59,\n            88,\n            28,\n            122,\n            88,\n            -8,\n            -91,\n            -87,\n            -126,\n            26,\n            104,\n            116,\n            -55,\n            -16,\n            39,\n            -77,\n            39,\n            92,\n            -31,\n            -66,\n            72,\n            -62,\n            -14,\n            119,\n            -104,\n            -64,\n            -39,\n            4,\n            -92,\n            47,\n            -31,\n            -109\n        ]\n    },\n    {\n        \"id\": 2,\n        \"email\": \"teacher@gmail.com\",\n        \"role\": \"teacher\",\n        \"verified\": false,\n        \"passwordHash\": \"228f27f55818139917ca9855dcfbdd9a3d3b5b05adca77414df57a2139fb3546\",\n        \"salt\": [\n            113,\n            84,\n            29,\n            -45,\n            -18,\n            88,\n            -124,\n            -102,\n            88,\n            -114,\n            -126,\n            113,\n            -41,\n            51,\n            -115,\n            20,\n            -14,\n            -76,\n            30,\n            92,\n            -32,\n            87,\n            -56,\n            102,\n            21,\n            -37,\n            63,\n            -118,\n            15,\n            117,\n            6,\n            -11\n        ]\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Admin verify user",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/admin/verify/4",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"verify",
+								"4"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Admin verify user",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/admin/verify/2",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"verify",
+										"2"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=13; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 03:40:45 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2"
+								}
+							],
+							"cookie": [],
+							"body": "{}"
+						}
+					]
+				},
+				{
+					"name": "Get all admins (as admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/admin",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"admin"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Show all admins (as admin)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/admin",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=13; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 03:41:35 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "14"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"userId\": 3\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get admin with id (as admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/admin/3",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"3"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Show all admins (as admin) Copy",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/admin/3",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"admin",
+										"3"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=13; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 03:42:00 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "12"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"userId\": 3\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Schedule",
+			"item": [
+				{
+					"name": "Creating schedule as teacher",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"startsAt\": \"2022-06-01T10:00:00Z[UTC]\",\r\n    \"endsAt\":   \"2022-06-01T18:00:00Z[UTC]\"\r\n}  "
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/schedule/create",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"schedule",
+								"create"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Creating schedule as teacher",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"startsAt\": \"2022-07-01T10:00:00Z[UTC]\",\r\n    \"endsAt\":   \"2022-07-01T18:00:00Z[UTC]\"\r\n}  "
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/schedule/create",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"schedule",
+										"create"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=4; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 04:11:46 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1"
+								}
+							],
+							"cookie": [],
+							"body": "2"
+						}
+					]
+				},
+				{
+					"name": "Updating schedule as teacher",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"startsAt\": \"2022-05-01T10:00:00Z[UTC]\",\r\n    \"endsAt\":   \"2022-05-01T18:00:00Z[UTC]\"\r\n}  "
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/schedule/update/3",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"schedule",
+								"update",
+								"3"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Updating schedule as teacher",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"startsAt\": \"2022-05-01T10:00:00Z[UTC]\",\r\n    \"endsAt\":   \"2022-05-01T18:00:00Z[UTC]\"\r\n}  "
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/schedule/update/3",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"schedule",
+										"update",
+										"3"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=8; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 04:24:31 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2"
+								}
+							],
+							"cookie": [],
+							"body": "{}"
+						}
+					]
+				},
+				{
+					"name": "Get schedule with id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/schedule/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"schedule",
+								"1"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get schedule with id",
+							"originalRequest": {
+								"method": "GET",
+								"header": []
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=8; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 04:25:23 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "98"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 3,\n    \"teacherId\": 4,\n    \"startsAt\": \"2022-05-01T10:00:00Z[UTC]\",\n    \"endsAt\": \"2022-05-01T18:00:00Z[UTC]\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get all schedules",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/schedule/all",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"schedule",
+								"all"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get all schedules",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/schedule/all",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"schedule",
+										"all"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=8; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 04:26:37 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "298"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"teacherId\": 1,\n        \"startsAt\": \"2022-06-01T10:00:00Z[UTC]\",\n        \"endsAt\": \"2022-06-01T18:00:00Z[UTC]\"\n    },\n    {\n        \"id\": 2,\n        \"teacherId\": 1,\n        \"startsAt\": \"2022-07-01T10:00:00Z[UTC]\",\n        \"endsAt\": \"2022-07-01T18:00:00Z[UTC]\"\n    },\n    {\n        \"id\": 3,\n        \"teacherId\": 4,\n        \"startsAt\": \"2022-05-01T10:00:00Z[UTC]\",\n        \"endsAt\": \"2022-05-01T18:00:00Z[UTC]\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get schedule for teacher with id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/schedule/?teacher=4",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"schedule",
+								""
+							],
+							"query": [
+								{
+									"key": "teacher",
+									"value": "4"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get schedule for teacher with id",
+							"originalRequest": {
+								"method": "GET",
+								"header": []
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=8; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 04:27:24 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "199"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"teacherId\": 1,\n        \"startsAt\": \"2022-06-01T10:00:00Z[UTC]\",\n        \"endsAt\": \"2022-06-01T18:00:00Z[UTC]\"\n    },\n    {\n        \"id\": 2,\n        \"teacherId\": 1,\n        \"startsAt\": \"2022-07-01T10:00:00Z[UTC]\",\n        \"endsAt\": \"2022-07-01T18:00:00Z[UTC]\"\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Delete schedule with id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/schedule/3",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"schedule",
+								"3"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Delete schedule with id",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/schedule/3",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"schedule",
+										"3"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=8; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 04:30:48 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2"
+								}
+							],
+							"cookie": [],
+							"body": "{}"
+						}
+					]
+				},
+				{
+					"name": "Find schedule for lesson",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"startsAt\": \"2022-09-01T10:00:00Z[UTC]\"\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/schedule/find",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"schedule",
+								"find"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Find schedule for lesson",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"startsAt\": \"2022-09-01T10:00:00Z[UTC]\"\r\n}  ",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/schedule/find",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"schedule",
+										"find"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=40; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 11:21:44 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "199"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 8,\n        \"teacherId\": 4,\n        \"startsAt\": \"2022-09-01T10:00:00Z[UTC]\",\n        \"endsAt\": \"2022-09-01T20:00:00Z[UTC]\"\n    },\n    {\n        \"id\": 9,\n        \"teacherId\": 1,\n        \"startsAt\": \"2022-09-01T10:00:00Z[UTC]\",\n        \"endsAt\": \"2022-09-01T20:00:00Z[UTC]\"\n    }\n]"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Replenishment",
+			"item": [
+				{
+					"name": "Creating replenishment for student",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amount\": \"4000\"\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/replenishment/create",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"replenishment",
+								"create"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Creating replenishment for student",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"amount\": \"4000\"\r\n}  ",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/replenishment/create",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"replenishment",
+										"create"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=11; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 05:04:04 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2"
+								}
+							],
+							"cookie": [],
+							"body": "{}"
+						}
+					]
+				},
+				{
+					"name": "Get all replenishments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/replenishment/",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"replenishment",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get all replenishments",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/replenishment/",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"replenishment",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=11; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 05:05:21 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "150"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"studentId\": 2,\n        \"amount\": 10000\n    },\n    {\n        \"id\": 2,\n        \"studentId\": 2,\n        \"amount\": 5000\n    },\n    {\n        \"id\": 3,\n        \"studentId\": 2,\n        \"amount\": 1000\n    },\n    {\n        \"id\": 4,\n        \"studentId\": 2,\n        \"amount\": 4000\n    }\n]"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Payment",
+			"item": [
+				{
+					"name": "Creating payment for lesson by completing it as a teacher",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/payment/lesson_completed/12",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"payment",
+								"lesson_completed",
+								"12"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Creating payment for lesson by completing it as a teacher",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/payment/lesson_completed/12",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"payment",
+										"lesson_completed",
+										"12"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 05:42:35 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "21"
+								}
+							],
+							"cookie": [],
+							"body": "\"Lesson already paid\""
+						}
+					]
+				},
+				{
+					"name": "Get all payments (depends on role)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/payment/",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"payment",
+								""
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get all payments (depends on role)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/payment/",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"payment",
+										""
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=21; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 05:49:33 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "636"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"studentId\": 2,\n        \"teacherId\": 4,\n        \"lessonId\": 1,\n        \"amount\": 500\n    },\n    {\n        \"id\": 2,\n        \"studentId\": 2,\n        \"teacherId\": 4,\n        \"lessonId\": 1,\n        \"amount\": 500\n    },\n    {\n        \"id\": 3,\n        \"studentId\": 2,\n        \"teacherId\": 4,\n        \"lessonId\": 1,\n        \"amount\": 500\n    },\n    {\n        \"id\": 5,\n        \"studentId\": 2,\n        \"teacherId\": 4,\n        \"lessonId\": 5,\n        \"amount\": 500\n    },\n    {\n        \"id\": 6,\n        \"studentId\": 2,\n        \"teacherId\": 4,\n        \"lessonId\": 6,\n        \"amount\": 500\n    },\n    {\n        \"id\": 7,\n        \"studentId\": 2,\n        \"teacherId\": 4,\n        \"lessonId\": 7,\n        \"amount\": 500\n    },\n    {\n        \"id\": 8,\n        \"studentId\": 2,\n        \"teacherId\": 4,\n        \"lessonId\": 9,\n        \"amount\": 500\n    },\n    {\n        \"id\": 9,\n        \"studentId\": 2,\n        \"teacherId\": 4,\n        \"lessonId\": 10,\n        \"amount\": 500\n    },\n    {\n        \"id\": 10,\n        \"studentId\": 2,\n        \"teacherId\": 4,\n        \"lessonId\": 11,\n        \"amount\": 500\n    },\n    {\n        \"id\": 11,\n        \"studentId\": 2,\n        \"teacherId\": 4,\n        \"lessonId\": 12,\n        \"amount\": 500\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get payment by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/payment/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"payment",
+								"1"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get payment by id",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/payment/1",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"payment",
+										"1"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=21; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 05:49:23 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "62"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 1,\n    \"studentId\": 2,\n    \"teacherId\": 4,\n    \"lessonId\": 1,\n    \"amount\": 500\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Withdrawal",
+			"item": [
+				{
+					"name": "Create withdrawal",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"amount\": \"1500\"\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/withdrawal/create",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"withdrawal",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all withdrawals (depends on role)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/withdrawal/",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"withdrawal",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Lesson",
+			"item": [
+				{
+					"name": "Creating lesson by student",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"teacherId\": 4,\r\n    \"startsAt\": \"2022-07-01T19:00:00Z[UTC]\"\r\n}  ",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/api/v1/lesson/create",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"lesson",
+								"create"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Creating lesson by student",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"teacherId\": 4,\r\n    \"startsAt\": \"2022-07-01T19:00:00Z[UTC]\"\r\n}  ",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/api/v1/lesson/create",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"lesson",
+										"create"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=11; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 05:13:02 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1"
+								}
+							],
+							"cookie": [],
+							"body": "1"
+						}
+					]
+				},
+				{
+					"name": "Get all lessons",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/lesson/all",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"lesson",
+								"all"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get all lessons",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/lesson/all",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"lesson",
+										"all"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=22; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 06:20:07 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1305"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-07-01T19:00:00Z[UTC]\",\n        \"endsAt\": \"2022-07-01T20:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 2,\n        \"teacherId\": 1,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-06-01T12:00:00Z[UTC]\",\n        \"endsAt\": \"2022-06-01T13:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 8,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-08-01T13:00:00Z[UTC]\",\n        \"endsAt\": \"2022-08-01T14:00:00Z[UTC]\",\n        \"completed\": false\n    },\n    {\n        \"id\": 5,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-08-01T10:00:00Z[UTC]\",\n        \"endsAt\": \"2022-08-01T11:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 6,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-08-01T11:00:00Z[UTC]\",\n        \"endsAt\": \"2022-08-01T12:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 7,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-08-01T12:00:00Z[UTC]\",\n        \"endsAt\": \"2022-08-01T13:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 9,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-09-01T10:00:00Z[UTC]\",\n        \"endsAt\": \"2022-09-01T11:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 10,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-09-01T11:00:00Z[UTC]\",\n        \"endsAt\": \"2022-09-01T12:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 11,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-09-01T12:00:00Z[UTC]\",\n        \"endsAt\": \"2022-09-01T13:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 12,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-09-01T13:00:00Z[UTC]\",\n        \"endsAt\": \"2022-09-01T14:00:00Z[UTC]\",\n        \"completed\": true\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get all upcoming lessons (admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/lesson/all/upcoming",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"lesson",
+								"all",
+								"upcoming"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get all upcoming lessons",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/lesson/all/upcoming",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"lesson",
+										"all",
+										"upcoming"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=22; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 06:35:06 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "132"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 8,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-08-01T13:00:00Z[UTC]\",\n        \"endsAt\": \"2022-08-01T14:00:00Z[UTC]\",\n        \"completed\": false\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get all completed lessons (admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/lesson/all/completed",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"lesson",
+								"all",
+								"completed"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get all completed lessons (admin)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/lesson/all/completed",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"lesson",
+										"all",
+										"completed"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=25; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 06:39:44 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1174"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 1,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-07-01T19:00:00Z[UTC]\",\n        \"endsAt\": \"2022-07-01T20:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 2,\n        \"teacherId\": 1,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-06-01T12:00:00Z[UTC]\",\n        \"endsAt\": \"2022-06-01T13:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 5,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-08-01T10:00:00Z[UTC]\",\n        \"endsAt\": \"2022-08-01T11:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 6,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-08-01T11:00:00Z[UTC]\",\n        \"endsAt\": \"2022-08-01T12:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 7,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-08-01T12:00:00Z[UTC]\",\n        \"endsAt\": \"2022-08-01T13:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 9,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-09-01T10:00:00Z[UTC]\",\n        \"endsAt\": \"2022-09-01T11:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 10,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-09-01T11:00:00Z[UTC]\",\n        \"endsAt\": \"2022-09-01T12:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 11,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-09-01T12:00:00Z[UTC]\",\n        \"endsAt\": \"2022-09-01T13:00:00Z[UTC]\",\n        \"completed\": true\n    },\n    {\n        \"id\": 12,\n        \"teacherId\": 4,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-09-01T13:00:00Z[UTC]\",\n        \"endsAt\": \"2022-09-01T14:00:00Z[UTC]\",\n        \"completed\": true\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get all completed lessons (teacher/student)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/lesson/completed",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"lesson",
+								"completed"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get all completed lessons (teacher/student)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/lesson/completed",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"lesson",
+										"completed"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=24; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 06:39:05 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "131"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    {\n        \"id\": 2,\n        \"teacherId\": 1,\n        \"studentId\": 2,\n        \"startsAt\": \"2022-06-01T12:00:00Z[UTC]\",\n        \"endsAt\": \"2022-06-01T13:00:00Z[UTC]\",\n        \"completed\": true\n    }\n]"
+						}
+					]
+				},
+				{
+					"name": "Get all upcoming lessons (teacher/student)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/api/v1/lesson/upcoming",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"v1",
+								"lesson",
+								"upcoming"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get all upcoming lessons (teacher/student)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/api/v1/lesson/upcoming",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"api",
+										"v1",
+										"lesson",
+										"upcoming"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "ssid=24; Domain=localhost; Path=/; SameSite=Lax"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 24 May 2022 06:38:49 GMT"
+								},
+								{
+									"key": "Content-Length",
+									"value": "2"
+								}
+							],
+							"cookie": [],
+							"body": "[]"
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "username",
+				"value": "<Basic Auth Username>",
+				"type": "string"
+			},
+			{
+				"key": "password",
+				"value": "<Basic Auth Password>",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "localhost:8080",
+			"type": "string"
+		}
+	]
+}

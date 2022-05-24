@@ -1,0 +1,49 @@
+### admin sign up
+
+POST http://localhost:8080/api/v1/auth/sign_up
+Content-Type: application/json
+
+{
+  "email": "admin100@gmail.com",
+  "password": "qwerty",
+  "role": "admin"
+}
+
+
+> {% client.global.set("cookie", response.headers.valueOf('Set-Cookie')); %}
+
+### admin check session
+
+GET http://localhost:8080/api/v1/auth/check_session
+Accept: application/json
+Cookie: {{cookie}}
+
+### admin sign out
+
+DELETE http://localhost:8080/api/v1/auth/sign_out
+Accept: application/json
+Cookie: {{cookie}}
+
+### admin sign in
+
+POST http://localhost:8080/api/v1/auth/sign_in
+Content-Type: application/json
+
+{
+  "email": "admin100@gmail.com",
+  "password": "qwerty"
+}
+
+> {% client.global.set("cookie", response.headers.valueOf('Set-Cookie')); %}
+
+### admin get all users
+
+GET http://localhost:8080/api/v1/auth/user/all
+Accept: application/json
+Cookie: {{cookie}}
+
+### admin get user with id
+
+GET http://localhost:8080/api/v1/auth/user/5
+Accept: application/json
+Cookie: {{cookie}}

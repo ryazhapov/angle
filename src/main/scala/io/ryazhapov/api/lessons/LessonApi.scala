@@ -61,13 +61,29 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService] extends Api[R] {
         case _ => IO(Response(Unauthorized))
       }
 
-    case GET -> Root / "all" :? CompletedParamMatcher(completed) as UserWithSession(user, session) =>
+    case GET -> Root / "all" / "completed" as UserWithSession(user, session) =>
       user.role match {
         case Role.AdminRole =>
 
           val handleRequest = for {
             _ <- log.info(s"Getting all lessons")
-            result <- LessonService.getAllLessonWithFilter(completed)
+            result <- LessonService.getAllLessonWithFilter(true)
+          } yield result
+          handleRequest.foldM(
+            throwableToHttpCode,
+            result => okWithCookie(result, session.id)
+          )
+
+        case _ => IO(Response(Unauthorized))
+      }
+
+    case GET -> Root / "all" / "upcoming" as UserWithSession(user, session) =>
+      user.role match {
+        case Role.AdminRole =>
+
+          val handleRequest = for {
+            _ <- log.info(s"Getting all lessons")
+            result <- LessonService.getAllLessonWithFilter(false)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,
@@ -93,18 +109,29 @@ class LessonApi[R <: Api.DefaultApiEnv with LessonService] extends Api[R] {
       }
 
 
-    case GET -> Root :? CompletedParamMatcher(completed) as UserWithSession(user, session) =>
+    case GET -> Root / "completed" as UserWithSession(user, session) =>
       user.role match {
         case AdminRole => IO(Response(MethodNotAllowed))
 
         case _ =>
           val handleRequest = for {
-            _ <- if (completed) {
-              log.info(s"Getting completed lessons for ${user.role} ${user.email}")
-            } else {
-              log.info(s"Getting upcoming lesson for ${user.role} ${user.email}")
-            }
-            result <- LessonService.getLessonsByUserWithFilter(user, completed)
+            _ <- log.info(s"Getting completed lessons for ${user.email}")
+            result <- LessonService.getLessonsByUserWithFilter(user, true)
+          } yield result
+          handleRequest.foldM(
+            throwableToHttpCode,
+            result => okWithCookie(result, session.id)
+          )
+      }
+
+    case GET -> Root / "upcoming" as UserWithSession(user, session) =>
+      user.role match {
+        case AdminRole => IO(Response(MethodNotAllowed))
+
+        case _ =>
+          val handleRequest = for {
+            _ <- log.info(s"Getting upcoming lessons for ${user.role} ${user.email}")
+            result <- LessonService.getLessonsByUserWithFilter(user, false)
           } yield result
           handleRequest.foldM(
             throwableToHttpCode,
