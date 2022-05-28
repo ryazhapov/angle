@@ -1,5 +1,7 @@
 # ANGLE: Language Learning Platform
 
+![](/images/angle-logo.png)
+
 ### Сервис для изучения английского языка (аналог skyeng.ru)
 
 - Ролевая модель: клиенты, преподаватели, администраторы
@@ -34,7 +36,7 @@
 
 ## Схема базы данных
 
-![](\images\database.png)
+![](/images/database.png)
 
 
 ## Примеры запросов
