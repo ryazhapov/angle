@@ -1,6 +1,6 @@
 # ANGLE: Language Learning Platform
 
-![](/images/angle-logo.png)
+![](/images/angle-logo.png =250x)
 
 ### Сервис для изучения английского языка (аналог skyeng.ru)
 
