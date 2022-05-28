@@ -22,8 +22,7 @@
 - **zio-logging** — Logging
 - **zio-config** — Reading config file
 - **docker** — Container
-- **zio-test** — Tests // TODO
-- **tapir** — Api documentation // TODO
+- **zio-test** — Tests
 
 ## Запуск
 
