@@ -22,12 +22,11 @@
 - **zio-logging** — Logging
 - **zio-config** — Reading config file
 - **docker** — Container
-- **zio-test** — Tests // TODO
-- **tapir** — Api documentation // TODO
+- **zio-test** — Tests 
 
 ## Презентация
 
-[Angle-slides.pdf![](/slides/angle.pdf)](/slides/angle.pdf)
+[angle.pdf![](/slides/angle.pdf)](/slides/angle.pdf)
 
 ## Запуск
 
